@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0d0e13;font-family:system-ui,sans-serif}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(255,255,255,.07);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 10px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#c0caf5;color:#0d0e13;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#e6e9f2}
+.dv-note{font:11.5px/1.7 system-ui,sans-serif;color:rgba(230,233,242,.5);max-width:900px;margin:0 0 24px}
+.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(255,255,255,.12);color:#e6e9f2;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 system-ui,sans-serif;color:rgba(230,233,242,.6)}
+.dv-card{max-width:100%;background:#16161e;border:1px solid rgba(255,255,255,.09);border-radius:10px;box-shadow:0 16px 40px rgba(0,0,0,.5);overflow:hidden}
+.dv-opt:target .dv-oid{background:#7aa2f7;color:#0d0e13}
+.dv-next{margin:24px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(230,233,242,.45)}
+.dv-next a{color:rgba(230,233,242,.8)}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t5">
+<div class="dv-thd"><a class="dv-tid" href="#t5">5</a><span class="dv-tname">Edge cases — failure &amp; boundary states · 4 treatments</span></div>
+<p class="dv-note">Three of the seven edges were already designed in upstream: multi-zone jump ⇒ one coalesced notice for the final zone (<a class="dv-oid" href="#2a">2a</a>) · downgrades shown like upgrades + dismissals re-armed (<a class="dv-oid" href="#2a">2a</a> · <a class="dv-oid" href="#2d">2d</a>) · explicit no-candidates report naming the rules checked (<a class="dv-oid" href="#3c">3c</a>). New here: <a class="dv-oid" href="#5a">5a</a> stale vs unknown — both stamped with the age of the last good reading (ticking live), no unsubstantiated zone ever shown · <a class="dv-oid" href="#5b">5b</a> invalid thresholds rejected with each problem named, defaults kept · <a class="dv-oid" href="#5c">5c</a> interactive — ignore every recommendation: one notice per zone entry, zero repeats, the bar stays truthful · <a class="dv-oid" href="#5d">5d</a> one monitor ↔ one session; a second session gets its own instance.</p>
+<div class="dv-opts">
+
+<!-- ══════════════ 5a STALE VS UNKNOWN ══════════════ -->
+<div class="dv-opt" id="5a" data-screen-label="5a Stale and unknown">
+  <div class="dv-olabel"><a class="dv-oid" href="#5a">5a</a>Stale vs unknown — age of the last good reading, ticking live</div>
+  <div class="dv-card" style="width:640px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">statusline — data-quality states</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">3 states</span>
+    </div>
+    <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+      <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px">LIVE — FRESH READING</div>
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:#1a1b26;border:1px solid rgba(255,255,255,.07);border-radius:6px;font:500 12px 'JetBrains Mono',monospace;white-space:nowrap">
+        <span style="color:#e0af68">◆</span><span style="color:#e0af68;font-weight:700">47%</span><span style="color:#e0af68;letter-spacing:1px">YELLOW</span>
+        <span style="color:#3b4261">▕<span style="color:#e0af68">██████████▍</span><span style="color:#2f3549">···········</span>▏</span>
+        <span style="color:#565f89">94k/200k</span>
+        <span style="flex:1"></span><span style="color:#3b4261">updated 2s ago</span>
+      </div>
+      <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px;margin-top:8px">STALE — SOURCE SILENT · AGE SHOWN, ZONE DEMOTED TO "LAST GOOD"</div>
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:#1a1b26;border:1px dashed #565f89;border-radius:6px;font:500 12px 'JetBrains Mono',monospace;white-space:nowrap">
+        <span style="color:#c0caf5;font-weight:700">⚠ STALE</span>
+        <span style="color:#565f89">last good {{staleAgeText}} ago →</span>
+        <span style="opacity:.45;color:#e0af68">◆ 47% YELLOW</span>
+        <span style="opacity:.45;color:#565f89">94k/200k</span>
+        <span style="flex:1"></span><span style="color:#3b4261">retrying source…</span>
+      </div>
+      <div style="font:400 10.5px 'JetBrains Mono',monospace;color:#565f89">the old reading is presented as history with its age — never silently held fresh</div>
+      <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px;margin-top:8px">UNKNOWN — SOURCE GONE · NO ZONE CLAIMED AT ALL</div>
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:#1a1b26;border:1px dashed #3b4261;border-radius:6px;font:500 12px 'JetBrains Mono',monospace;white-space:nowrap">
+        <span style="color:#565f89">◌</span><span style="color:#565f89;font-weight:700">--%</span><span style="color:#565f89;letter-spacing:1px">UNKNOWN</span>
+        <span style="color:#2f3549">▕······················▏</span>
+        <span style="flex:1"></span><span style="color:#565f89">session ended · last good reading 6m ago</span>
+      </div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      Both states carry the age of the last good reading — the difference is whether any zone can still be claimed · an unsubstantiated zone is never shown as live
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 5b INVALID CONFIG ══════════════ -->
+<div class="dv-opt" id="5b" data-screen-label="5b Invalid config rejected">
+  <div class="dv-olabel"><a class="dv-oid" href="#5b">5b</a>ctxmon config — invalid thresholds rejected by name · defaults kept</div>
+  <div class="dv-card" style="width:600px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">ctxmon config — validation</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">3 scenarios</span>
+    </div>
+    <div style="padding:14px 16px">
+      <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px">REJECTED — EVERY PROBLEM NAMED</div>
+      <div style="margin-top:8px;font:400 12.5px/1.7 'JetBrains Mono',monospace;color:#c0caf5"><span style="color:#7aa2f7">❯</span> ctxmon config set --yellow 65 --orange 60 --red 120</div>
+      <div style="margin-top:6px;border:1px solid #f7768e;border-radius:6px;background:rgba(247,118,142,.07);padding:9px 12px">
+        <div style="font:700 12px 'JetBrains Mono',monospace;color:#f7768e">✗ invalid thresholds — configuration rejected</div>
+        <div style="margin-top:5px;font:400 11.5px/1.7 'JetBrains Mono',monospace;color:#c0caf5">1. orange (60) is below yellow (65) — boundaries out of order</div>
+        <div style="font:400 11.5px/1.7 'JetBrains Mono',monospace;color:#c0caf5">2. red (120) is outside 0–100</div>
+        <div style="margin-top:5px;font:400 11px 'JetBrains Mono',monospace;color:#565f89">nothing changed — defaults in effect: 40 / 60 / 75</div>
+      </div>
+      <div style="margin-top:10px;font:400 12.5px/1.7 'JetBrains Mono',monospace;color:#c0caf5"><span style="color:#7aa2f7">❯</span> ctxmon config set --yellow 40 --orange 40 --red 75</div>
+      <div style="font:400 11.5px/1.7 'JetBrains Mono',monospace"><span style="color:#f7768e">✗ rejected — yellow and orange overlap at 40</span> <span style="color:#565f89">· defaults kept</span></div>
+      <div style="height:1px;background:rgba(255,255,255,.06);margin:14px 0 12px"></div>
+      <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px">APPLIED — A VALID CONFIG TAKES EFFECT QUIETLY</div>
+      <div style="margin-top:8px;font:400 12.5px/1.7 'JetBrains Mono',monospace;color:#c0caf5"><span style="color:#7aa2f7">❯</span> ctxmon config set --yellow 45 --orange 65 --red 80</div>
+      <div style="font:400 11.5px/1.7 'JetBrains Mono',monospace;color:#565f89"><span style="color:#9ece6a">⏺</span> zones now <span style="color:#c0caf5">45 / 65 / 80</span> — applied to the live statusline immediately</div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      Rejection names the problem — out-of-order, overlap, out-of-range — and falls back to defaults · never a silent half-apply
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 5c IGNORE IT ALL ══════════════ -->
+<div class="dv-opt" id="5c" data-screen-label="5c Ignore everything">
+  <div class="dv-olabel"><a class="dv-oid" href="#5c">5c</a>Ignore it all — interactive · one notice per zone entry, zero nags</div>
+  <div class="dv-card" style="width:620px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">session transcript — recommendations ignored</span>
+      <span style="font:600 11px 'JetBrains Mono',monospace;color:#f7768e">■ RED — advisory only</span>
+    </div>
+    <div style="padding:14px 16px 12px;font:400 12.5px/1.7 'JetBrains Mono',monospace;color:#c0caf5;display:flex;flex-direction:column;gap:3px">
+      <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> pagination added · usage 76% <span style="color:#f7768e">red</span></div>
+      <div style="border:1px solid #f7768e;border-radius:6px;background:rgba(247,118,142,.08);padding:8px 12px;margin:6px 0 2px">
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span style="font:700 12px 'JetBrains Mono',monospace;color:#f7768e">■ ENTERED RED</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#565f89">crossed 75% · now 76%</span></div>
+        <div style="margin-top:3px;font:400 12px 'JetBrains Mono',monospace">Start a fresh session from a handoff summary.</div>
+        <div style="margin-top:4px;font:400 10.5px 'JetBrains Mono',monospace;color:#565f89">one recommendation per zone entry — this is it</div>
+      </div>
+      <sc-for list="{{ignRows}}" as="r" hint-placeholder-count="1">
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div><span style="color:#7aa2f7">❯</span> {{r.cmd}}</div>
+          <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> done · usage <span style="color:#f7768e;font-weight:600">{{r.pct}}%</span> <span style="color:#f7768e">red</span> <span style="color:#3b4261">— no repeat, bar updated</span></div>
+        </div>
+      </sc-for>
+      <div style="display: {{ignDoneDisplay}};border:1px dashed #3b4261;border-radius:6px;padding:8px 12px;margin-top:4px">
+        <div style="font:400 11.5px/1.6 'JetBrains Mono',monospace;color:#c0caf5">○ five turns of advice ignored — still exactly one notice. The monitor keeps reflecting reality and stays quiet until the zone changes.</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <div onClick="{{ignWork}}" style="display: {{ignBtnDisplay}};cursor:pointer;border:1px solid #7aa2f7;border-radius:5px;padding:3px 12px;font:600 11px 'JetBrains Mono',monospace;color:#7aa2f7" style-hover="background:rgba(122,162,247,.14)">⏎ keep working — ignore the advice</div>
+        <div onClick="{{ignReset}}" style="cursor:pointer;border:1px solid #3b4261;border-radius:5px;padding:3px 10px;font:600 11px 'JetBrains Mono',monospace;color:#565f89" style-hover="color:#c0caf5;border-color:#565f89">[r] reset</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;background:#1a1b26;border-top:1px solid rgba(255,255,255,.07);font:500 12px 'JetBrains Mono',monospace;white-space:nowrap">
+      <span style="color:#f7768e">■</span>
+      <span style="color:#f7768e;font-weight:700">{{ignPctText}}</span>
+      <span style="color:#f7768e;letter-spacing:1px">RED</span>
+      <span style="color:#3b4261">▕<span style="color:#f7768e">{{ignBarFill}}</span><span style="color:#2f3549">{{ignBarRest}}</span>▏</span>
+      <span style="color:#565f89">{{ignTokens}}</span>
+      <span style="flex:1"></span>
+      <span style="color:#3b4261">{{ignCount}}</span>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      Ignoring the advice is a supported workflow, not an error — reality on the bar, zero repeats · re-arms only on the next zone entry
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 5d TWO SESSIONS ══════════════ -->
+<div class="dv-opt" id="5d" data-screen-label="5d Two sessions">
+  <div class="dv-olabel"><a class="dv-oid" href="#5d">5d</a>Two sessions — the monitor tracks the one it's attached to</div>
+  <div class="dv-card" style="width:860px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">two agent sessions · one machine</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">attachment is per-session</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr">
+      <div style="padding:14px 16px 12px;border-right:1px solid rgba(255,255,255,.06);font:400 11.5px/1.8 'JetBrains Mono',monospace">
+        <div style="font:600 9.5px 'JetBrains Mono',monospace;color:#ff9e64;letter-spacing:1.5px">TTY 1 · SESSION 8F2C — MONITORED</div>
+        <div style="margin-top:8px;color:#c0caf5"><span style="color:#7aa2f7">❯</span> continue the pagination work</div>
+        <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> done · 3 endpoints updated</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding:6px 10px;background:#1a1b26;border-radius:5px;font:500 11.5px 'JetBrains Mono',monospace;white-space:nowrap">
+          <span style="color:#ff9e64">▲</span><span style="color:#ff9e64;font-weight:700">72%</span><span style="color:#ff9e64;letter-spacing:1px">ORANGE</span><span style="color:#3b4261">▕<span style="color:#ff9e64">███████████████▊</span><span style="color:#2f3549">······</span>▏</span><span style="color:#565f89">144k/200k</span>
+        </div>
+        <div style="margin-top:8px;font:400 10.5px/1.6 'JetBrains Mono',monospace;color:#565f89">bound to 8f2c at attach — reads only this session's usage, pings only this tty</div>
+      </div>
+      <div style="padding:14px 16px 12px;font:400 11.5px/1.8 'JetBrains Mono',monospace">
+        <div style="font:600 9.5px 'JetBrains Mono',monospace;color:#565f89;letter-spacing:1.5px">TTY 2 · SESSION B41E — NOT ATTACHED</div>
+        <div style="margin-top:8px;color:#c0caf5"><span style="color:#7aa2f7">❯</span> spike the importer rewrite</div>
+        <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> scaffold written · 4 files</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding:6px 10px;border:1px dashed #3b4261;border-radius:5px;font:500 11.5px 'JetBrains Mono',monospace;color:#565f89;white-space:nowrap">
+          <span>◌</span><span>no statusline — this session is unmonitored</span>
+        </div>
+        <div style="margin-top:8px;font:400 10.5px/1.6 'JetBrains Mono',monospace;color:#565f89"><span style="color:#c0caf5">❯ ctxmon</span> here starts a second, independent instance — its own zones, notices, and log</div>
+      </div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      One monitor ↔ the session it attached to — no cross-talk, never a blended number · aggregate multi-session view: out of scope per Assumptions
+    </div>
+  </div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "flip <a class="dv-oid" href="#5a">5a</a>'s stale into unknown live" · "mount <a class="dv-oid" href="#5c">5c</a>'s no-nag counter on <a class="dv-oid" href="#1a">1a</a>" · "one-pager: 4 stories + 7 edges traceability" · "paste the next section".</p>
+</section>
+
+<section class="dv-turn" id="t4">
+<div class="dv-thd"><a class="dv-tid" href="#t4">4</a><span class="dv-tname">US4 — Handoff summary for a fresh session · 4 treatments</span></div>
+<p class="dv-note">Closes the loop from <a class="dv-oid" href="#2a">2a</a>'s red advisory — one command, one plain file: task state + key decisions + pointers to every saved artifact. <a class="dv-oid" href="#4a">4a</a> generates it live (click ▸ run) · <a class="dv-oid" href="#4b">4b</a> is the file itself — what the next session actually reads; all 3 artifacts referenced per acceptance #1 · <a class="dv-oid" href="#4c">4c</a> is the payoff: a fresh session resumes from ≈2k tokens of handoff instead of 164k of history (SC-006) · <a class="dv-oid" href="#4d">4d</a> proves zone-independence — recommended in red, available in green, identical file either way.</p>
+<div class="dv-opts">
+
+<!-- ══════════════ 4a GENERATE ══════════════ -->
+<div class="dv-opt" id="4a" data-screen-label="4a Generate handoff">
+  <div class="dv-olabel"><a class="dv-oid" href="#4a">4a</a>ctxmon handoff — interactive · click run, watch it assemble</div>
+  <div class="dv-card" style="width:620px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">ctxmon handoff — session 8f2c</span>
+      <span style="font:600 11px 'JetBrains Mono',monospace;color:#f7768e">■ RED 82% — fresh session advised</span>
+    </div>
+    <div style="padding:14px 16px 16px;font:400 12.5px/1.8 'JetBrains Mono',monospace">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="color:#c0caf5"><span style="color:#7aa2f7">❯</span> ctxmon handoff</span>
+        <div onClick="{{hoRun}}" style="display: {{hoBtnDisplay}};cursor:pointer;border:1px solid #7aa2f7;border-radius:5px;padding:2px 12px;font:600 11px 'JetBrains Mono',monospace;color:#7aa2f7" style-hover="background:rgba(122,162,247,.14)">▸ run</div>
+      </div>
+      <div style="display: {{hoD1}};color:#565f89"><span style="color:#9ece6a">⏺</span> collecting — 34 turns · 164k/200k · zone <span style="color:#f7768e">red</span></div>
+      <div style="display: {{hoD2}};color:#565f89"><span style="color:#9ece6a">⏺</span> task state <span style="color:#c0caf5">3 done · 1 in progress · 2 open</span> — from turns 30–34</div>
+      <div style="display: {{hoD3}};color:#565f89"><span style="color:#9ece6a">⏺</span> key decisions <span style="color:#c0caf5">3</span> · artifact pointers <span style="color:#c0caf5">3</span></div>
+      <div style="display: {{hoD4}};color:#565f89"><span style="color:#9ece6a">⏺</span> verifying artifacts on disk — <span style="color:#9ece6a">3/3 present</span></div>
+      <div style="display: {{hoD5}};color:#9ece6a">+ handoff/2026-07-02-8f2c.md <span style="color:#565f89">· 48 lines · plain markdown</span></div>
+      <div style="display: {{hoDoneDisplay}};border:1px solid rgba(158,206,106,.4);border-radius:6px;background:rgba(158,206,106,.06);padding:10px 12px;margin-top:8px">
+        <div style="font:700 12px 'JetBrains Mono',monospace;color:#9ece6a">⏺ HANDOFF READY — this session can end without losing state</div>
+        <div style="margin-top:4px;font:400 11px/1.6 'JetBrains Mono',monospace;color:#565f89">next: start a fresh session → read the handoff first → continue at <span style="color:#c0caf5">watch-pane keybindings</span> · see <a href="#4c" style="color:#7aa2f7">4c</a></div>
+        <div onClick="{{hoAgain}}" style="cursor:pointer;display:inline-block;margin-top:8px;border:1px solid #3b4261;border-radius:5px;padding:3px 10px;font:600 11px 'JetBrains Mono',monospace;color:#565f89" style-hover="color:#c0caf5;border-color:#565f89">[r] run again</div>
+      </div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      On request only — red recommends, never auto-runs · fixed sections: task state · decisions · artifacts
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 4b THE FILE ══════════════ -->
+<div class="dv-opt" id="4b" data-screen-label="4b The handoff file">
+  <div class="dv-olabel"><a class="dv-oid" href="#4b">4b</a>The file — plain markdown the next session actually reads</div>
+  <div class="dv-card" style="width:700px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">handoff/2026-07-02-8f2c.md · 48 lines</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">readable without ctxmon</span>
+    </div>
+    <div style="padding:14px 18px 16px;font:400 11.5px/1.75 'JetBrains Mono',monospace;color:#c0caf5">
+      <div style="color:#7aa2f7;font-weight:700"># Handoff — acme-cli · session 8f2c</div>
+      <div style="color:#565f89">- written 2026-07-02 14:52 · at 82% (red) · 164k/200k · 34 turns</div>
+      <div style="color:#565f89">- reading this + linked artifacts ≈ <span style="color:#9ece6a">2k tokens</span> — not the 164k that produced it</div>
+      <div style="margin-top:10px;color:#7aa2f7;font-weight:700">## Task state</div>
+      <div><span style="color:#9ece6a">✓ done</span> <span style="color:#565f89">—</span> zone engine · statusline renderer · artifact scan</div>
+      <div><span style="color:#e0af68">◐ in progress</span> <span style="color:#565f89">—</span> watch-pane keybindings <span style="color:#565f89">(h = handoff view pending)</span></div>
+      <div><span style="color:#565f89">○ open — handoff generator tests · README quickstart</span></div>
+      <div style="margin-top:10px;color:#7aa2f7;font-weight:700">## Key decisions</div>
+      <div>1. Adapter approach for the auth layer <span style="color:#565f89">→</span> <span style="color:#73daca">artifacts/decision-auth-adapter.md</span></div>
+      <div>2. Retries capped at 3, exp backoff 250ms base <span style="color:#565f89">— captured here (no artifact saved)</span></div>
+      <div>3. Pagination page size ≤ 50 — partner rate limit <span style="color:#565f89">→</span> <span style="color:#73daca">artifacts/constraint-rate-limit.md</span></div>
+      <div style="margin-top:10px;color:#7aa2f7;font-weight:700">## Saved artifacts <span style="color:#9ece6a">(3/3 verified on disk)</span></div>
+      <div><span style="color:#73daca">- artifacts/decision-auth-adapter.md</span> <span style="color:#565f89">· turn 12 · auth layer decision</span></div>
+      <div><span style="color:#73daca">- artifacts/constraint-rate-limit.md</span> <span style="color:#565f89">· turn 26 · 60 req/min per key</span></div>
+      <div><span style="color:#73daca">- artifacts/result-pooling-benchmark.md</span> <span style="color:#565f89">· turn 29 · p95 340ms → 120ms</span></div>
+      <div style="margin-top:10px;color:#7aa2f7;font-weight:700">## Resume</div>
+      <div style="color:#565f89">1. start a fresh session in ~/acme-cli</div>
+      <div style="color:#565f89">2. read this file · pull artifacts only as needed</div>
+      <div style="color:#565f89">3. continue at: <span style="color:#c0caf5">watch-pane keybindings</span></div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      Acceptance #1 — references current task state and all three artifacts · decisions survive even when no artifact was saved (item 2)
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 4c THE RESUME ══════════════ -->
+<div class="dv-opt" id="4c" data-screen-label="4c Resume in fresh session">
+  <div class="dv-olabel"><a class="dv-oid" href="#4c">4c</a>The payoff — old session ends, fresh one resumes informed (SC-006)</div>
+  <div class="dv-card" style="width:840px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">two sessions, one handoff file</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">nothing re-explained</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 34px 1fr;align-items:stretch">
+      <div style="padding:14px 16px 12px;font:400 11.5px/1.8 'JetBrains Mono',monospace">
+        <div style="font:600 9.5px 'JetBrains Mono',monospace;color:#f7768e;letter-spacing:1.5px">SESSION 8F2C — ENDS IN RED</div>
+        <div style="margin-top:8px;color:#c0caf5"><span style="color:#7aa2f7">❯</span> ctxmon handoff</div>
+        <div style="color:#9ece6a">+ handoff/2026-07-02-8f2c.md</div>
+        <div style="color:#c0caf5"><span style="color:#7aa2f7">❯</span> /exit</div>
+        <div style="color:#565f89">session closed — state lives on disk, not in context</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding:6px 10px;background:#1a1b26;border-radius:5px;font:500 11.5px 'JetBrains Mono',monospace">
+          <span style="color:#f7768e">■</span><span style="color:#f7768e;font-weight:700">82%</span><span style="color:#f7768e;letter-spacing:1px">RED</span><span style="color:#565f89">164k/200k</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(255,255,255,.06);border-right:1px solid rgba(255,255,255,.06);color:#3b4261;font:700 14px 'JetBrains Mono',monospace">→</div>
+      <div style="padding:14px 16px 12px;font:400 11.5px/1.8 'JetBrains Mono',monospace">
+        <div style="font:600 9.5px 'JetBrains Mono',monospace;color:#9ece6a;letter-spacing:1.5px">SESSION C9D1 — STARTS FRESH</div>
+        <div style="margin-top:8px;color:#c0caf5"><span style="color:#7aa2f7">❯</span> read handoff/2026-07-02-8f2c.md, then continue the watch-pane keybindings</div>
+        <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> handoff read · honoring: adapter auth · retry ≤ 3 · page ≤ 50</div>
+        <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> resuming in-progress work — <span style="color:#c0caf5">watch-pane keybindings</span> · nothing re-explained</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding:6px 10px;background:#1a1b26;border-radius:5px;font:500 11.5px 'JetBrains Mono',monospace">
+          <span style="color:#9ece6a">●</span><span style="color:#9ece6a;font-weight:700">8%</span><span style="color:#9ece6a;letter-spacing:1px">GREEN</span><span style="color:#565f89">16k/200k · full runway</span>
+        </div>
+      </div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      SC-006 — the new session inherits conclusions (≈2k tokens), not the 164k of conversation that produced them
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 4d ZONE-INDEPENDENT ══════════════ -->
+<div class="dv-opt" id="4d" data-screen-label="4d Available in any zone">
+  <div class="dv-olabel"><a class="dv-oid" href="#4d">4d</a>Any zone — the advice is zone-driven, the capability is not</div>
+  <div class="dv-card" style="width:600px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">ctxmon handoff — zone behavior</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">2 scenarios</span>
+    </div>
+    <div style="padding:14px 16px">
+      <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px">IN GREEN — PRODUCED ANYWAY</div>
+      <div style="margin-top:8px;font:400 12.5px/1.7 'JetBrains Mono',monospace;color:#c0caf5"><span style="color:#7aa2f7">❯</span> ctxmon handoff</div>
+      <div style="font:400 11.5px/1.7 'JetBrains Mono',monospace;color:#565f89"><span style="color:#9ece6a">⏺</span> session c9d1 · <span style="color:#9ece6a">● 22% green</span></div>
+      <div style="margin-top:6px;border:1px dashed #3b4261;border-radius:6px;padding:8px 12px;font:400 11px/1.6 'JetBrains Mono',monospace;color:#565f89">○ note: you're in green — a handoff isn't needed yet. Writing it anyway; the recommendation is zone-driven, the command is not.</div>
+      <div style="margin-top:6px;font:400 11.5px/1.7 'JetBrains Mono',monospace;color:#9ece6a">+ handoff/2026-07-02-c9d1.md</div>
+      <div style="height:1px;background:rgba(255,255,255,.06);margin:14px 0 12px"></div>
+      <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px">IN RED — RECOMMENDED, NEVER AUTOMATIC</div>
+      <div style="margin-top:8px;border:1px solid #f7768e;border-radius:6px;background:rgba(247,118,142,.08);padding:7px 11px;font:400 11px 'JetBrains Mono',monospace"><span style="color:#f7768e;font-weight:700">■ RED 82%</span> <span style="color:#c0caf5">— start a fresh session from a handoff summary</span></div>
+      <div style="margin-top:8px;font:400 12.5px/1.7 'JetBrains Mono',monospace;color:#c0caf5"><span style="color:#7aa2f7">❯</span> ctxmon handoff</div>
+      <div style="font:400 11.5px/1.7 'JetBrains Mono',monospace;color:#9ece6a">+ handoff/2026-07-02-8f2c.md</div>
+      <div style="margin-top:4px;font:400 10.5px 'JetBrains Mono',monospace;color:#565f89">same sections, same format — the zone changed the advice, not the file</div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      Acceptance #3 — a green-zone request still produces the file · it only ever runs on request
+    </div>
+  </div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "wire <a class="dv-oid" href="#4a">4a</a>'s run to reveal <a class="dv-oid" href="#4b">4b</a>'s file live" · "combine <a class="dv-oid" href="#1a">1a</a> + <a class="dv-oid" href="#2b">2b</a> + <a class="dv-oid" href="#4a">4a</a> into one end-to-end prototype" · "terser handoff template" · "one-pager of all four user stories"</p>
+</section>
+
+<section class="dv-turn" id="t3">
+<div class="dv-thd"><a class="dv-tid" href="#t3">3</a><span class="dv-tname">US3 — Artifact candidates before compaction · 4 treatments</span></div>
+<p class="dv-note">Scan on demand from orange (60%+) · every candidate = excerpt + source turn + the named rule that flagged it · decisions per-candidate; only accepted ones touch the workspace. <a class="dv-oid" href="#3a">3a</a> is a working review loop — click accept/reject yourself, the write list updates live · <a class="dv-oid" href="#3b">3b</a> is whole-list triage with the exact write plan (accept 2 ⇒ exactly 2 files) · <a class="dv-oid" href="#3c">3c</a> covers the edge scenarios: explicit no-matches report + identical rescan fingerprint · <a class="dv-oid" href="#3d">3d</a> is what lands on disk — plain markdown with provenance. Candidate 1 is the spec's "we decided to use the adapter approach" scenario.</p>
+<div class="dv-opts">
+
+<!-- ══════════════ 3a REVIEW LOOP ══════════════ -->
+<div class="dv-opt" id="3a" data-screen-label="3a Review loop">
+  <div class="dv-olabel"><a class="dv-oid" href="#3a">3a</a>Review loop — interactive · accept/reject each candidate yourself</div>
+  <div class="dv-card" style="width:620px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">ctxmon artifacts — session 8f2c</span>
+      <span style="font:600 11px 'JetBrains Mono',monospace;color:#ff9e64">▲ ORANGE 68% — scan available</span>
+    </div>
+    <div style="padding:14px 16px 16px">
+      <div style="font:400 12.5px/1.7 'JetBrains Mono',monospace;color:#c0caf5"><span style="color:#7aa2f7">❯</span> ctxmon artifacts</div>
+      <div style="font:400 11.5px/1.7 'JetBrains Mono',monospace;color:#565f89"><span style="color:#9ece6a">⏺</span> scanned 34 turns · 4 rules · <span style="color:#c0caf5">5 candidates</span> · fingerprint <span style="color:#3b4261">a3f2c9</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
+        <sc-for list="{{artDots}}" as="d" hint-placeholder-count="5">
+          <span style="font:700 13px 'JetBrains Mono',monospace;color: {{d.color}}">{{d.glyph}}</span>
+        </sc-for>
+        <span style="flex:1"></span>
+        <span style="font:400 11px 'JetBrains Mono',monospace;color:#565f89">{{artIdxText}}</span>
+      </div>
+      <div style="display: {{artCardDisplay}};border:1px solid rgba(255,255,255,.12);border-radius:6px;background:#1a1b26;padding:11px 13px;margin-top:8px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font:700 10.5px 'JetBrains Mono',monospace;letter-spacing:.5px;color: {{curRuleColor}};background: {{curRuleBg}};border:1px solid {{curRuleColor}};border-radius:999px;padding:2px 9px">{{curRule}}</span>
+          <span style="font:400 11px 'JetBrains Mono',monospace;color:#565f89">matched {{curPhrase}}</span>
+          <span style="flex:1"></span>
+          <span style="font:400 11px 'JetBrains Mono',monospace;color:#565f89">{{curLoc}}</span>
+        </div>
+        <div style="margin-top:9px;padding:8px 12px;border-left:2px solid {{curRuleColor}};background:rgba(255,255,255,.03);font:400 12.5px/1.65 'JetBrains Mono',monospace;color:#c0caf5">{{curPre}}<span style="color: {{curRuleColor}};font-weight:700;text-decoration:underline;text-underline-offset:3px">{{curMatch}}</span>{{curPost}}</div>
+        <div style="margin-top:8px;font:400 11px 'JetBrains Mono',monospace;color:#565f89">on accept → <span style="color:#c0caf5">{{curFile}}</span></div>
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <div onClick="{{artAccept}}" style="cursor:pointer;border:1px solid #9ece6a;border-radius:5px;padding:4px 14px;font:600 11.5px 'JetBrains Mono',monospace;color:#9ece6a" style-hover="background:rgba(158,206,106,.14)">[y] accept</div>
+          <div onClick="{{artReject}}" style="cursor:pointer;border:1px solid #f7768e;border-radius:5px;padding:4px 14px;font:600 11.5px 'JetBrains Mono',monospace;color:#f7768e" style-hover="background:rgba(247,118,142,.14)">[n] reject</div>
+          <div onClick="{{artUndo}}" style="cursor:pointer;opacity: {{artUndoOp}};border:1px solid #3b4261;border-radius:5px;padding:4px 14px;font:600 11.5px 'JetBrains Mono',monospace;color:#565f89" style-hover="color:#c0caf5">[u] undo</div>
+        </div>
+      </div>
+      <div style="display: {{artDoneDisplay}};border:1px solid rgba(158,206,106,.4);border-radius:6px;background:rgba(158,206,106,.06);padding:10px 12px;margin-top:8px">
+        <div style="font:700 12px 'JetBrains Mono',monospace;color:#9ece6a">⏺ REVIEW COMPLETE — {{artSummary}}</div>
+        <div style="margin-top:4px;font:400 11px 'JetBrains Mono',monospace;color:#565f89">{{artWroteLine}}</div>
+        <div style="margin-top:6px;display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{artWritten}}" as="w" hint-placeholder-count="2">
+            <div style="font:400 11.5px 'JetBrains Mono',monospace;color:#9ece6a">+ {{w.path}}</div>
+          </sc-for>
+        </div>
+        <div onClick="{{artReset}}" style="cursor:pointer;display:inline-block;margin-top:8px;border:1px solid #3b4261;border-radius:5px;padding:3px 10px;font:600 11px 'JetBrains Mono',monospace;color:#565f89" style-hover="color:#c0caf5;border-color:#565f89">[r] review again</div>
+      </div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      One decision per candidate · only accepted are written · deterministic — rerunning the scan returns the same 5
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 3b TRIAGE TABLE ══════════════ -->
+<div class="dv-opt" id="3b" data-screen-label="3b Triage table">
+  <div class="dv-olabel"><a class="dv-oid" href="#3b">3b</a>Triage table — whole list at once · exact write plan</div>
+  <div class="dv-card" style="width:720px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">ctxmon artifacts --list · session 8f2c · <span style="color:#ff9e64">▲ 68%</span></span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">5 candidates · 4 rules</span>
+    </div>
+    <div style="padding:12px 16px 14px;font-family:'JetBrains Mono',monospace">
+      <div style="display:grid;grid-template-columns:18px 150px 1fr 84px;gap:0 12px;font:600 9.5px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:1.5px;padding-bottom:6px">
+        <span>#</span><span>RULE</span><span>EXCERPT · SOURCE</span><span style="text-align:right">DECISION</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 150px 1fr 84px;gap:0 12px;padding:8px 0;border-top:1px solid rgba(255,255,255,.05);align-items:start">
+        <span style="font:400 11px 'JetBrains Mono',monospace;color:#3b4261">1</span>
+        <div><span style="font:700 10px 'JetBrains Mono',monospace;color:#7aa2f7;border:1px solid #7aa2f7;border-radius:999px;padding:1px 8px;background:rgba(122,162,247,.1)">decision-language</span><div style="margin-top:4px;font:400 10px 'JetBrains Mono',monospace;color:#565f89">matched “we decided”</div></div>
+        <div><div style="font:400 11.5px/1.5 'JetBrains Mono',monospace;color:#c0caf5">“<span style="color:#7aa2f7;font-weight:700">We decided</span> to use the adapter approach for the auth layer…”</div><div style="font:400 10px 'JetBrains Mono',monospace;color:#565f89;margin-top:2px">turn 12 · assistant</div></div>
+        <span style="text-align:right;font:600 11px 'JetBrains Mono',monospace;color:#9ece6a">✓ accept</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 150px 1fr 84px;gap:0 12px;padding:8px 0;border-top:1px solid rgba(255,255,255,.05);align-items:start;opacity:.55">
+        <span style="font:400 11px 'JetBrains Mono',monospace;color:#3b4261">2</span>
+        <div><span style="font:700 10px 'JetBrains Mono',monospace;color:#7aa2f7;border:1px solid #7aa2f7;border-radius:999px;padding:1px 8px;background:rgba(122,162,247,.1)">decision-language</span><div style="margin-top:4px;font:400 10px 'JetBrains Mono',monospace;color:#565f89">matched “agreed to”</div></div>
+        <div><div style="font:400 11.5px/1.5 'JetBrains Mono',monospace;color:#c0caf5">“<span style="color:#7aa2f7;font-weight:700">Agreed to</span> cap retries at 3, exponential backoff…”</div><div style="font:400 10px 'JetBrains Mono',monospace;color:#565f89;margin-top:2px">turn 18 · user</div></div>
+        <span style="text-align:right;font:600 11px 'JetBrains Mono',monospace;color:#565f89">✗ skip</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 150px 1fr 84px;gap:0 12px;padding:8px 0;border-top:1px solid rgba(255,255,255,.05);align-items:start;opacity:.55">
+        <span style="font:400 11px 'JetBrains Mono',monospace;color:#3b4261">3</span>
+        <div><span style="font:700 10px 'JetBrains Mono',monospace;color:#bb9af7;border:1px solid #bb9af7;border-radius:999px;padding:1px 8px;background:rgba(187,154,247,.1)">conclusion-language</span><div style="margin-top:4px;font:400 10px 'JetBrains Mono',monospace;color:#565f89">matched “root cause”</div></div>
+        <div><div style="font:400 11.5px/1.5 'JetBrains Mono',monospace;color:#c0caf5">“<span style="color:#bb9af7;font-weight:700">Root cause</span> confirmed: 401 loop was clock skew…”</div><div style="font:400 10px 'JetBrains Mono',monospace;color:#565f89;margin-top:2px">turn 21 · assistant</div></div>
+        <span style="text-align:right;font:600 11px 'JetBrains Mono',monospace;color:#565f89">✗ skip</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 150px 1fr 84px;gap:0 12px;padding:8px 0;border-top:1px solid rgba(255,255,255,.05);align-items:start">
+        <span style="font:400 11px 'JetBrains Mono',monospace;color:#3b4261">4</span>
+        <div><span style="font:700 10px 'JetBrains Mono',monospace;color:#73daca;border:1px solid #73daca;border-radius:999px;padding:1px 8px;background:rgba(115,218,202,.1)">constraint-discovery</span><div style="margin-top:4px;font:400 10px 'JetBrains Mono',monospace;color:#565f89">matched “rate-limits … must”</div></div>
+        <div><div style="font:400 11.5px/1.5 'JetBrains Mono',monospace;color:#c0caf5">“Partner API <span style="color:#73daca;font-weight:700">rate-limits to 60 req/min</span> — page size ≤ 50…”</div><div style="font:400 10px 'JetBrains Mono',monospace;color:#565f89;margin-top:2px">turn 26 · assistant</div></div>
+        <span style="text-align:right;font:600 11px 'JetBrains Mono',monospace;color:#9ece6a">✓ accept</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 150px 1fr 84px;gap:0 12px;padding:8px 0 10px;border-top:1px solid rgba(255,255,255,.05);align-items:start;opacity:.55">
+        <span style="font:400 11px 'JetBrains Mono',monospace;color:#3b4261">5</span>
+        <div><span style="font:700 10px 'JetBrains Mono',monospace;color:#2ac3de;border:1px solid #2ac3de;border-radius:999px;padding:1px 8px;background:rgba(42,195,222,.1)">produced-result</span><div style="margin-top:4px;font:400 10px 'JetBrains Mono',monospace;color:#565f89">matched “p95 … ms”</div></div>
+        <div><div style="font:400 11.5px/1.5 'JetBrains Mono',monospace;color:#c0caf5">“Pooling: <span style="color:#2ac3de;font-weight:700">p95 340ms → 120ms</span>, 12 runs…”</div><div style="font:400 10px 'JetBrains Mono',monospace;color:#565f89;margin-top:2px">turn 29 · assistant</div></div>
+        <span style="text-align:right;font:600 11px 'JetBrains Mono',monospace;color:#565f89">✗ skip</span>
+      </div>
+      <div style="border:1px solid rgba(158,206,106,.35);background:rgba(158,206,106,.05);border-radius:6px;padding:9px 12px">
+        <div style="font:700 11px 'JetBrains Mono',monospace;color:#9ece6a;letter-spacing:.5px">WRITE PLAN — exactly the accepted set, nothing else</div>
+        <div style="margin-top:5px;font:400 11.5px/1.6 'JetBrains Mono',monospace;color:#9ece6a">+ artifacts/decision-auth-adapter.md</div>
+        <div style="font:400 11.5px/1.6 'JetBrains Mono',monospace;color:#9ece6a">+ artifacts/constraint-rate-limit.md</div>
+        <div style="margin-top:4px;font:400 10.5px 'JetBrains Mono',monospace;color:#565f89">3 rejected candidates → not written · no other files touched</div>
+      </div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      Accept two ⇒ exactly two files · offered from orange (60%+) — this session: 68%
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 3c EDGE BEHAVIOR ══════════════ -->
+<div class="dv-opt" id="3c" data-screen-label="3c Empty state and determinism">
+  <div class="dv-olabel"><a class="dv-oid" href="#3c">3c</a>Edge behavior — explicit no-matches report · rescan fingerprint</div>
+  <div class="dv-card" style="width:600px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">ctxmon artifacts — edge behavior</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">2 scenarios</span>
+    </div>
+    <div style="padding:14px 16px">
+      <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px">NO MATCHES — EXPLICIT, NEVER SILENT</div>
+      <div style="margin-top:8px;font:400 12.5px/1.7 'JetBrains Mono',monospace;color:#c0caf5"><span style="color:#7aa2f7">❯</span> ctxmon artifacts</div>
+      <div style="font:400 11.5px/1.7 'JetBrains Mono',monospace;color:#565f89"><span style="color:#9ece6a">⏺</span> scanned 41 turns · 4 rules · session b41e · <span style="color:#ff9e64">▲ 66%</span></div>
+      <div style="margin-top:7px;border:1px dashed #3b4261;border-radius:6px;padding:9px 12px">
+        <div style="font:700 12px 'JetBrains Mono',monospace;color:#c0caf5">○ No artifact candidates found.</div>
+        <div style="margin-top:4px;font:400 11px/1.6 'JetBrains Mono',monospace;color:#565f89">None of the 4 rules (decision · conclusion · constraint · result) matched this session's content. Nothing was written to the workspace.</div>
+      </div>
+      <div style="height:1px;background:rgba(255,255,255,.06);margin:16px 0 14px"></div>
+      <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px">DETERMINISTIC — SAME CONTENT, SAME LIST</div>
+      <div style="margin-top:8px;display:flex;flex-direction:column;gap:5px;font:400 11.5px 'JetBrains Mono',monospace">
+        <div style="display:flex;gap:12px;align-items:baseline"><span style="color:#565f89">14:02</span><span style="color:#c0caf5">scan</span><span style="color:#565f89">→ 5 candidates</span><span style="color:#7aa2f7">fingerprint a3f2c9</span></div>
+        <div style="display:flex;gap:12px;align-items:baseline"><span style="color:#565f89">14:31</span><span style="color:#c0caf5">rescan</span><span style="color:#565f89">→ 5 candidates</span><span style="color:#7aa2f7">fingerprint a3f2c9</span><span style="font:700 10px 'JetBrains Mono',monospace;color:#9ece6a;border:1px solid #9ece6a;border-radius:999px;padding:1px 8px">IDENTICAL</span></div>
+      </div>
+      <div style="margin-top:8px;font:400 10.5px 'JetBrains Mono',monospace;color:#565f89">ordered, regex-based rules — no sampling, no model calls, no clock in the hash</div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      The empty result is a report, not silence · fingerprint makes determinism checkable at a glance
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 3d ON DISK ══════════════ -->
+<div class="dv-opt" id="3d" data-screen-label="3d Saved artifact on disk">
+  <div class="dv-olabel"><a class="dv-oid" href="#3d">3d</a>On disk — plain readable files with provenance</div>
+  <div class="dv-card" style="width:750px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">workspace after review — 2 accepted ⇒ 2 files</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">~/acme-cli</span>
+    </div>
+    <div style="display:grid;grid-template-columns:290px 1fr;gap:0">
+      <div style="padding:14px 14px 12px;border-right:1px solid rgba(255,255,255,.06);font:400 11px/1.8 'JetBrains Mono',monospace;color:#565f89;white-space:nowrap">
+        <div style="color:#c0caf5">~/acme-cli/</div>
+        <div>├ src/</div>
+        <div>├ tests/</div>
+        <div style="color:#c0caf5">├ artifacts/</div>
+        <div>│ ├ <span style="color:#9ece6a">decision-auth-adapter.md</span> <span style="font:700 9px 'JetBrains Mono',monospace;color:#9ece6a">NEW</span></div>
+        <div>│ └ <span style="color:#9ece6a">constraint-rate-limit.md</span> <span style="font:700 9px 'JetBrains Mono',monospace;color:#9ece6a">NEW</span></div>
+        <div>└ .git/</div>
+        <div style="margin-top:10px;font:400 10px/1.6 'JetBrains Mono',monospace;color:#3b4261;white-space:normal">artifacts/ created on first accept · rejected candidates leave no trace</div>
+      </div>
+      <div style="padding:14px 16px 12px">
+        <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:1.5px">artifacts/decision-auth-adapter.md</div>
+        <div style="margin-top:8px;font:400 11.5px/1.75 'JetBrains Mono',monospace;color:#c0caf5">
+          <div style="color:#7aa2f7;font-weight:700"># Decision — adapter approach for auth layer</div>
+          <div style="margin-top:6px;color:#565f89">- session: 8f2c · turn 12 · 2026-07-02 10:07</div>
+          <div style="color:#565f89">- rule: decision-language (matched “we decided”)</div>
+          <div style="color:#565f89">- saved: accepted by user before compaction</div>
+          <div style="margin-top:6px;color:#9ece6a">&gt; We decided to use the adapter approach for</div>
+          <div style="color:#9ece6a">&gt; the auth layer; token exchange stays</div>
+          <div style="color:#9ece6a">&gt; server-side. The gateway only sees</div>
+          <div style="color:#9ece6a">&gt; short-lived session tokens.</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      Plain markdown — readable without ctxmon · provenance header answers "where did this come from?" · quote is verbatim from the session
+    </div>
+  </div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "wire <a class="dv-oid" href="#3a">3a</a>'s accepted files into <a class="dv-oid" href="#3d">3d</a>'s tree live" · "denser one-line candidate list" · "mount the scan inside <a class="dv-oid" href="#1c">1c</a>'s watch pane" · "paste US4"</p>
+</section>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">US2 — Zone-appropriate guidance on transitions · 4 treatments</span></div>
+<p class="dv-note">Boundaries per US2: 40 / 60 / 75% — tweak defaults and turn-1 visuals synced to spec. Everything advisory; the tool never acts. <a class="dv-oid" href="#2a">2a</a> plays the whole arc statically — coalesced jump (35→68% = one orange notice, yellow skipped), dismiss + no-repeat, quiet recovery · <a class="dv-oid" href="#2b">2b</a> and <a class="dv-oid" href="#2c">2c</a> share the live sim: each boundary fires exactly once, loop wrap = compaction back to green · <a class="dv-oid" href="#2d">2d</a> is the after-the-fact audit trail that explains every ping.</p>
+<div class="dv-opts">
+
+<!-- ══════════════ 2a INLINE INTERJECTIONS ══════════════ -->
+<div class="dv-opt" id="2a" data-screen-label="2a Inline interjections">
+  <div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Inline interjections — full arc: coalesce · dismiss · no-repeat · recovery</div>
+  <div class="dv-card" style="width:600px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">session transcript — boundary interjections</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">zones 40/60/75</span>
+    </div>
+    <div style="padding:16px;font:400 12.5px/1.7 'JetBrains Mono',monospace;color:#c0caf5;display:flex;flex-direction:column;gap:3px">
+      <div><span style="color:#7aa2f7">❯</span> summarize the auth approach so far</div>
+      <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> summary written · usage 35% <span style="color:#9ece6a">green</span></div>
+      <div style="display:flex;align-items:center;gap:8px"><span style="color:#7aa2f7">❯</span><span style="border:1px dashed #3b4261;border-radius:4px;padding:0 8px;color:#565f89">⎘ pasted api-reference.md · ~66k tokens</span></div>
+      <div style="border:1px solid #ff9e64;border-radius:6px;background:rgba(255,158,100,.07);padding:9px 12px;margin:7px 0 2px">
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span style="font:700 12px 'JetBrains Mono',monospace;color:#ff9e64">▲ ENTERED ORANGE</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#565f89">35% → 68% in one step · crossed 40% &amp; 60%</span></div>
+        <div style="margin-top:4px;font:400 12px 'JetBrains Mono',monospace;color:#c0caf5">Review artifact candidates, then compact the conversation.</div>
+        <div style="margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;font:400 10.5px 'JetBrains Mono',monospace;color:#565f89"><span>one notice for the whole jump — yellow skipped</span><span>advisory — nothing runs by itself</span><span style="color:#7aa2f7">[d] dismiss</span></div>
+      </div>
+      <div style="font:400 10.5px 'JetBrains Mono',monospace;color:#565f89;text-align:right">✓ dismissed — orange stays quiet until the zone changes</div>
+      <div style="margin-top:4px"><span style="color:#7aa2f7">❯</span> extract the retry logic into a helper</div>
+      <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> done · usage 71% <span style="color:#ff9e64">orange</span> <span style="color:#3b4261">— still orange, no repeat</span></div>
+      <div><span style="color:#7aa2f7">❯</span> add pagination to the list endpoints</div>
+      <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> done · usage 78% <span style="color:#f7768e">red</span></div>
+      <div style="border:1px solid #f7768e;border-radius:6px;background:rgba(247,118,142,.08);padding:9px 12px;margin:7px 0 2px">
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span style="font:700 12px 'JetBrains Mono',monospace;color:#f7768e">■ ENTERED RED</span><span style="font:400 11px 'JetBrains Mono',monospace;color:#565f89">crossed 75% · now 78%</span></div>
+        <div style="margin-top:4px;font:400 12px 'JetBrains Mono',monospace;color:#c0caf5">Start a fresh session from a handoff summary.</div>
+        <div style="margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;font:400 10.5px 'JetBrains Mono',monospace;color:#565f89"><span>ctxmon handoff drafts it — you decide</span><span style="color:#7aa2f7">[d] dismiss</span></div>
+      </div>
+      <div style="margin-top:4px"><span style="color:#7aa2f7">❯</span> /compact</div>
+      <div style="display:flex;align-items:center;gap:8px;margin:6px 0"><div style="width:14px;height:1px;background:#24283b"></div><span style="color:#9ece6a">● BACK IN GREEN</span><span style="color:#565f89">· compaction 78% → 30% · notices re-armed</span><div style="flex:1;height:1px;background:#24283b"></div></div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      Fires only on boundary crossings · a multi-zone jump = one notice for the final zone · recovery is a quiet stamp, not an alert
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 2b BOUNDARY TOAST ══════════════ -->
+<div class="dv-opt" id="2b" data-screen-label="2b Boundary toast">
+  <div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Boundary toast — live sim · fires once per crossing, then auto-quiets</div>
+  <div class="dv-card" style="width:600px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">zsh — claude · live sim</span>
+      <span style="font:600 11px 'JetBrains Mono',monospace;color: {{zoneColor}}">{{zoneName}}</span>
+    </div>
+    <div style="padding:14px 16px 10px;font:400 12.5px/1.8 'JetBrains Mono',monospace;color:#c0caf5;min-height:84px;display:flex;flex-direction:column;justify-content:flex-end">
+      <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> wrote src/notify.ts (+120) · 14 tests passing</div>
+      <div><span style="color:#7aa2f7">❯</span> tighten the debounce on the resize path<span style="opacity: {{cursorOn}};color:#c0caf5">▌</span></div>
+    </div>
+    <div style="display: {{toastDisplay}};flex-direction:column;gap:3px;margin:0 14px 10px;border:1px solid {{toastColor}};background: {{toastBg}};border-radius:6px;padding:8px 12px">
+      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span style="font:700 11.5px 'JetBrains Mono',monospace;color: {{toastColor}}">{{toastGlyph}} {{toastTitle}}</span><span style="font:400 10.5px 'JetBrains Mono',monospace;color:#565f89">{{toastSub}}</span></div>
+      <div style="font:400 11.5px 'JetBrains Mono',monospace;color:#c0caf5">{{toastGuide}}</div>
+      <div style="font:400 10px 'JetBrains Mono',monospace;color:#565f89">advisory — nothing runs by itself · d dismiss · re-arms at the next boundary</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;background:#1a1b26;border-top:1px solid rgba(255,255,255,.07);font:500 12px 'JetBrains Mono',monospace;white-space:nowrap">
+      <span style="color: {{zoneColor}}">●</span>
+      <span style="color: {{zoneColor}};font-weight:700">{{pctText}}</span>
+      <span style="color: {{zoneColor}};letter-spacing:1px">{{zoneName}}</span>
+      <span style="color:#3b4261">▕<span style="color: {{zoneColor}}">{{barFill}}</span><span style="color:#2f3549">{{barRest}}</span>▏</span>
+      <span style="color:#565f89">{{tokensText}}</span>
+    </div>
+    <div style="padding:8px 14px 10px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;gap:3px">
+      <div style="font:600 9.5px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px">FIRED — NEWEST FIRST · ONE PER CROSSING</div>
+      <sc-for list="{{evLog}}" as="ev" hint-placeholder-count="2">
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#565f89"><span style="color: {{ev.c}}">{{ev.glyph}} {{ev.zone}}</span> @ {{ev.pct}}% · {{ev.trig}}</div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 2c STATUSLINE TAKEOVER ══════════════ -->
+<div class="dv-opt" id="2c" data-screen-label="2c Statusline takeover">
+  <div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Statusline takeover — the bar IS the notification · live sim</div>
+  <div class="dv-card" style="width:680px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">zsh — claude · zero new chrome</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">80×24</span>
+    </div>
+    <div style="padding:14px 16px 12px;font:400 12.5px/1.8 'JetBrains Mono',monospace;color:#c0caf5;min-height:84px;display:flex;flex-direction:column;justify-content:flex-end">
+      <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> refactored the watch loop into a state machine</div>
+      <div><span style="color:#7aa2f7">❯</span> profile the render path<span style="opacity: {{cursorOn}};color:#c0caf5">▌</span></div>
+    </div>
+    <div style="display: {{slExpDisplay}};align-items:center;gap:10px;padding:9px 14px;background: {{toastBg}};border-top:2px solid {{toastColor}};font:500 12px 'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden">
+      <span style="color: {{toastColor}};font-weight:700">{{toastGlyph}} {{toastTitle}}</span>
+      <span style="color:#565f89">{{toastSub}}</span>
+      <span style="color:#c0caf5">— {{slGuide}}</span>
+      <span style="flex:1"></span>
+      <span style="color:#3b4261">d dismiss</span>
+    </div>
+    <div style="display: {{slNormDisplay}};align-items:center;gap:12px;padding:8px 14px;background:#1a1b26;border-top:1px solid rgba(255,255,255,.07);font:500 12px 'JetBrains Mono',monospace;white-space:nowrap">
+      <span style="color: {{zoneColor}}">●</span>
+      <span style="color: {{zoneColor}};font-weight:700">{{pctText}}</span>
+      <span style="color: {{zoneColor}};letter-spacing:1px">{{zoneName}}</span>
+      <span style="color:#3b4261">▕<span style="color: {{zoneColor}}">{{barFill}}</span><span style="color:#2f3549">{{barRest}}</span>▏</span>
+      <span style="color:#565f89">{{tokensText}}</span>
+      <span style="flex:1"></span>
+      <span style="color:#3b4261">⌃G watch</span>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      At each crossing the bar mutates for ~6s — zone, threshold, guidance — then collapses back to the chip · transcript never interrupted
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 2d TRANSITION LEDGER ══════════════ -->
+<div class="dv-opt" id="2d" data-screen-label="2d Transition ledger">
+  <div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a>ctxmon log — the audit trail behind every ping</div>
+  <div class="dv-card" style="width:680px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">ctxmon log --transitions · session 8f2c</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">today</span>
+    </div>
+    <div style="padding:14px 16px;display:flex;flex-direction:column;gap:7px;font:400 11.5px 'JetBrains Mono',monospace">
+      <div style="display:grid;grid-template-columns:42px 158px 38px 148px 1fr;gap:0 12px;font:600 9.5px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:1.5px">
+        <span>TIME</span><span>TRANSITION</span><span>AT</span><span>TRIGGER</span><span>OUTCOME</span>
+      </div>
+      <div style="display:grid;grid-template-columns:42px 158px 38px 148px 1fr;gap:0 12px;color:#c0caf5">
+        <span style="color:#565f89">09:41</span><span><span style="color:#9ece6a">●</span> → <span style="color:#e0af68">◆ YELLOW</span></span><span style="color:#e0af68">43%</span><span style="color:#565f89">crossed 40%</span><span style="color:#565f89">shown — retrieval over pastes</span>
+      </div>
+      <div style="display:grid;grid-template-columns:42px 158px 38px 148px 1fr;gap:0 12px;color:#c0caf5">
+        <span style="color:#565f89">10:07</span><span><span style="color:#e0af68">◆</span> → <span style="color:#ff9e64">▲ ORANGE</span></span><span style="color:#ff9e64">68%</span><span style="color:#565f89">crossed 60% (paste +24%)</span><span style="color:#565f89">shown — compact · <span style="color:#c0caf5">dismissed by user</span></span>
+      </div>
+      <div style="display:grid;grid-template-columns:42px 158px 38px 148px 1fr;gap:0 12px;opacity:.45">
+        <span style="color:#565f89">10:19</span><span style="color:#565f89">— no event</span><span style="color:#565f89">71%</span><span style="color:#565f89">still orange</span><span style="color:#565f89">suppressed — dismissed in this zone</span>
+      </div>
+      <div style="display:grid;grid-template-columns:42px 158px 38px 148px 1fr;gap:0 12px;color:#c0caf5">
+        <span style="color:#565f89">10:33</span><span><span style="color:#ff9e64">▲</span> → <span style="color:#f7768e">■ RED</span></span><span style="color:#f7768e">78%</span><span style="color:#565f89">crossed 75%</span><span style="color:#565f89">shown — fresh session from handoff</span>
+      </div>
+      <div style="display:grid;grid-template-columns:42px 158px 38px 148px 1fr;gap:0 12px;color:#c0caf5">
+        <span style="color:#565f89">10:41</span><span><span style="color:#f7768e">■</span> → <span style="color:#9ece6a">● GREEN</span></span><span style="color:#9ece6a">30%</span><span style="color:#565f89">compaction −48%</span><span style="color:#565f89">recovery notice — re-armed</span>
+      </div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      Every row names zone + threshold — "why did it ping me?" is always answerable · exactly one row per crossing · dismissals logged
+    </div>
+  </div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "mount <a class="dv-oid" href="#2c">2c</a>'s takeover on <a class="dv-oid" href="#1a">1a</a>" · "louder red treatment" · "combine <a class="dv-oid" href="#2a">2a</a> + <a class="dv-oid" href="#2b">2b</a> into one prototype" · "paste US3"</p>
+</section>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">US1 — Always-visible context health signal · 5 surfaces</span></div>
+<p class="dv-note">Assumptions: zones green &lt;40% · yellow &lt;60% · orange &lt;75% · red ≥75% (US2 spec) (tweakable in the Tweaks panel, with window size + sim speed) · 200k window · Tokyo Night palette, JetBrains Mono · <a class="dv-oid" href="#1a">1a</a> and <a class="dv-oid" href="#1c">1c</a> run a live session sim so you can watch thresholds flip without re-asking (the 38→42% acceptance scenario) · unknown never renders green — quiet form in <a class="dv-oid" href="#1b">1b</a>, loud form in <a class="dv-oid" href="#1e">1e</a> · ASCII fallbacks shown in <a class="dv-oid" href="#1a">1a</a>/<a class="dv-oid" href="#1d">1d</a> · colorblind-safe encoding in <a class="dv-oid" href="#1d">1d</a>.</p>
+<div class="dv-opts">
+
+<!-- ══════════════ 1a STATUSLINE ══════════════ -->
+<div class="dv-opt" id="1a" data-screen-label="1a Statusline">
+  <div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Statusline — docked, always-on (live sim)</div>
+  <div class="dv-card" style="width:760px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">zsh — claude · ~/acme-cli</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">80×24</span>
+    </div>
+    <div style="padding:14px 16px 12px;font:400 13px/1.8 'JetBrains Mono',monospace;color:#c0caf5;min-height:120px;display:flex;flex-direction:column;justify-content:flex-end">
+      <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> Updated src/zones.ts (+38 −6) · 6 tests passing</div>
+      <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> Wrote docs/thresholds.md</div>
+      <div><span style="color:#7aa2f7">❯</span> now wire the watch renderer into the event loop<span style="opacity: {{cursorOn}};color:#c0caf5">▌</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;background:#1a1b26;border-top:1px solid rgba(255,255,255,.07);font:500 12px 'JetBrains Mono',monospace;white-space:nowrap">
+      <span style="color: {{zoneColor}}">●</span>
+      <span style="color: {{zoneColor}};font-weight:700">{{pctText}}</span>
+      <span style="color: {{zoneColor}};letter-spacing:1px">{{zoneName}}</span>
+      <span style="color:#3b4261">▕<span style="color: {{zoneColor}}">{{barFill}}</span><span style="color:#2f3549">{{barRest}}</span>▏</span>
+      <span style="color:#565f89">{{tokensText}}</span>
+      <span style="color:#7aa2f7">{{sparkStr}}</span>
+      <span style="color:#565f89">{{etaText}}</span>
+      <span style="flex:1"></span>
+      <span style="color:#3b4261">⌃G watch</span>
+    </div>
+    <div style="padding:6px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 11px 'JetBrains Mono',monospace;color:#565f89">
+      <span style="color:#3b4261">ASCII fallback:</span> ctx {{asciiBar}}
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 1b TURN STAMPS ══════════════ -->
+<div class="dv-opt" id="1b" data-screen-label="1b Turn stamps">
+  <div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Turn stamps — inline in the transcript · quiet unknown</div>
+  <div class="dv-card" style="width:560px">
+    <div style="display:flex;align-items:center;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">session transcript</span>
+    </div>
+    <div style="padding:16px;font:400 12.5px/1.75 'JetBrains Mono',monospace;color:#c0caf5;display:flex;flex-direction:column;gap:2px">
+      <div><span style="color:#7aa2f7">❯</span> scaffold the CLI entrypoint and arg parser</div>
+      <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> created src/cli.ts, src/args.ts · +214 lines</div>
+      <div style="display:flex;align-items:center;gap:8px;margin:6px 0"><div style="width:14px;height:1px;background:#24283b"></div><span style="color:#9ece6a">○ ctx 25%</span><span style="color:#9ece6a">green</span><span style="color:#565f89">· 50k/200k</span><div style="flex:1;height:1px;background:#24283b"></div></div>
+      <div><span style="color:#7aa2f7">❯</span> add the zone threshold engine with tests</div>
+      <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> 6 tests passing · src/zones.ts</div>
+      <div style="display:flex;align-items:center;gap:8px;margin:6px 0"><div style="width:14px;height:1px;background:#24283b"></div><span style="color:#9ece6a">◔ ctx 38%</span><span style="color:#9ece6a">green</span><span style="color:#565f89">· 76k/200k</span><div style="flex:1;height:1px;background:#24283b"></div></div>
+      <div><span style="color:#7aa2f7">❯</span> wire the live watch renderer</div>
+      <div style="color:#565f89"><span style="color:#9ece6a">⏺</span> renderer streaming · src/watch.ts</div>
+      <div style="display:flex;align-items:center;gap:8px;margin:6px 0"><div style="width:14px;height:1px;background:#24283b"></div><span style="color:#e0af68">◑ ctx 52%</span><span style="color:#e0af68">yellow</span><span style="color:#565f89">· 104k/200k · ~11 turns→red</span><div style="flex:1;height:1px;background:#24283b"></div></div>
+      <div><span style="color:#7aa2f7">❯</span> refactor the renderer into a state machine</div>
+      <div style="color:#565f89"><span style="color:#e0af68">⏺</span> connection to telemetry socket lost, retrying…</div>
+      <div style="display:flex;align-items:center;gap:8px;margin:6px 0"><div style="width:14px;height:1px;background:#24283b"></div><span style="color:#565f89">◌ ctx --%</span><span style="color:#565f89">unknown</span><span style="color:#3b4261">· telemetry unavailable — not assuming green</span><div style="flex:1;height:1px;background:#24283b"></div></div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      Glyph fill encodes zone (○◔◑◕●) — readable without color · unknown is quiet gray, never green
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 1c WATCH PANE ══════════════ -->
+<div class="dv-opt" id="1c" data-screen-label="1c Watch pane">
+  <div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>ctxmon watch — dedicated live pane (live sim)</div>
+  <div class="dv-card" style="width:720px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">ctxmon watch — session 8f2c</span>
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#3b4261">refresh 2s</span>
+    </div>
+    <div style="display:grid;grid-template-columns:250px 1fr;gap:22px;padding:18px 18px 14px;font-family:'JetBrains Mono',monospace">
+      <div>
+        <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px;margin-bottom:2px">USAGE</div>
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <span style="font-size:46px;font-weight:700;color: {{zoneColor}};line-height:1.1">{{pctText}}</span>
+          <span style="font:700 11px 'JetBrains Mono',monospace;letter-spacing:1.5px;padding:3px 10px;border-radius:999px;border:1px solid {{zoneColor}};color: {{zoneColor}};background: {{zoneBg}}">{{zoneName}}</span>
+        </div>
+        <div style="position:relative;height:10px;background:#1f2335;border-radius:5px;margin-top:14px">
+          <div style="height:100%;border-radius:5px;background: {{zoneColor}};width: {{meterW}}%"></div>
+          <div style="position:absolute;left:40%;top:-3px;bottom:-3px;width:1px;background:rgba(255,255,255,.25)"></div>
+          <div style="position:absolute;left:60%;top:-3px;bottom:-3px;width:1px;background:rgba(255,255,255,.25)"></div>
+          <div style="position:absolute;left:75%;top:-3px;bottom:-3px;width:1px;background:rgba(255,255,255,.25)"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px;font:400 10px 'JetBrains Mono',monospace;color:#565f89">
+          <span><span style="color:#9ece6a">●</span> &lt;40</span>
+          <span><span style="color:#e0af68">●</span> 40–60</span>
+          <span><span style="color:#ff9e64">●</span> 60–75</span>
+          <span><span style="color:#f7768e">●</span> ≥75</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:16px;font:400 12px 'JetBrains Mono',monospace"><span style="color:#3b4261">TOKENS</span><span style="color:#c0caf5">{{tokensText}}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font:400 12px 'JetBrains Mono',monospace"><span style="color:#3b4261">BURN</span><span style="color:#c0caf5">{{burnText}}</span></div>
+      </div>
+      <div>
+        <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px;margin-bottom:6px">HISTORY</div>
+        <div style="position:relative;height:68px;display:flex;align-items:flex-end;gap:2px">
+          <div style="position:absolute;left:0;right:0;bottom:27px;border-top:1px dashed rgba(224,175,104,.3)"></div>
+          <div style="position:absolute;left:0;right:0;bottom:41px;border-top:1px dashed rgba(255,158,100,.3)"></div>
+          <div style="position:absolute;left:0;right:0;bottom:51px;border-top:1px dashed rgba(247,118,142,.35)"></div>
+          <sc-for list="{{histCols}}" as="col" hint-placeholder-count="44">
+            <div style="width:7px;border-radius:2px 2px 0 0;height: {{col.h}}px;background: {{col.c}}"></div>
+          </sc-for>
+        </div>
+        <div style="margin-top:12px;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:8px 12px">
+          <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px;margin-bottom:3px">FORECAST</div>
+          <div style="font:400 12px 'JetBrains Mono',monospace;color:#c0caf5">{{forecastText}}</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 11px 'JetBrains Mono',monospace;color:#565f89">
+      <span><span style="color:#3b4261">q</span> quit · <span style="color:#3b4261">z</span> zones · <span style="color:#3b4261">a</span> artifact candidates · <span style="color:#3b4261">h</span> handoff</span>
+      <span style="color:#3b4261">loop = one session, then compaction</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 1d PROMPT CHIP ══════════════ -->
+<div class="dv-opt" id="1d" data-screen-label="1d Prompt chip">
+  <div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Prompt chip — powerline segment · traffic-light vs colorblind-safe</div>
+  <div class="dv-card" style="width:640px">
+    <div style="display:flex;align-items:center;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">zsh — prompt segment</span>
+    </div>
+    <div style="display:flex;gap:28px;padding:16px 18px 12px">
+      <div style="flex:1">
+        <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px;margin-bottom:10px">TRAFFIC LIGHT</div>
+        <div style="display:flex;flex-direction:column;gap:9px;font:500 12px 'JetBrains Mono',monospace">
+          <div style="display:flex;align-items:center"><span style="background:#3b4261;color:#c0caf5;padding:2px 8px">~/acme</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #3b4261"></div><span style="background:#9ece6a;color:#101014;font-weight:700;padding:2px 8px">● 25%</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #9ece6a"></div><span style="color:#7aa2f7;margin-left:8px">❯</span></div>
+          <div style="display:flex;align-items:center"><span style="background:#3b4261;color:#c0caf5;padding:2px 8px">~/acme</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #3b4261"></div><span style="background:#e0af68;color:#101014;font-weight:700;padding:2px 8px">◆ 45%</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #e0af68"></div><span style="color:#7aa2f7;margin-left:8px">❯</span></div>
+          <div style="display:flex;align-items:center"><span style="background:#3b4261;color:#c0caf5;padding:2px 8px">~/acme</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #3b4261"></div><span style="background:#ff9e64;color:#101014;font-weight:700;padding:2px 8px">▲ 72%</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #ff9e64"></div><span style="color:#7aa2f7;margin-left:8px">❯</span></div>
+          <div style="display:flex;align-items:center"><span style="background:#3b4261;color:#c0caf5;padding:2px 8px">~/acme</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #3b4261"></div><span style="background:#f7768e;color:#101014;font-weight:700;padding:2px 8px">■ 91%</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #f7768e"></div><span style="color:#7aa2f7;margin-left:8px">❯</span></div>
+          <div style="display:flex;align-items:center"><span style="background:#3b4261;color:#c0caf5;padding:2px 8px">~/acme</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #3b4261"></div><span style="border:1px dashed #565f89;color:#565f89;padding:1px 8px">◌ --%</span><span style="color:#7aa2f7;margin-left:8px">❯</span></div>
+        </div>
+      </div>
+      <div style="flex:1">
+        <div style="font:600 10px 'JetBrains Mono',monospace;color:#3b4261;letter-spacing:2px;margin-bottom:10px">COLORBLIND-SAFE · OKABE-ITO + SHAPE</div>
+        <div style="display:flex;flex-direction:column;gap:9px;font:500 12px 'JetBrains Mono',monospace">
+          <div style="display:flex;align-items:center"><span style="background:#3b4261;color:#c0caf5;padding:2px 8px">~/acme</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #3b4261"></div><span style="background:#56B4E9;color:#101014;font-weight:700;padding:2px 8px">● 25%</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #56B4E9"></div><span style="color:#7aa2f7;margin-left:8px">❯</span></div>
+          <div style="display:flex;align-items:center"><span style="background:#3b4261;color:#c0caf5;padding:2px 8px">~/acme</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #3b4261"></div><span style="background:#F0E442;color:#101014;font-weight:700;padding:2px 8px">◆ 45%</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #F0E442"></div><span style="color:#7aa2f7;margin-left:8px">❯</span></div>
+          <div style="display:flex;align-items:center"><span style="background:#3b4261;color:#c0caf5;padding:2px 8px">~/acme</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #3b4261"></div><span style="background:#E69F00;color:#101014;font-weight:700;padding:2px 8px">▲ 72%</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #E69F00"></div><span style="color:#7aa2f7;margin-left:8px">❯</span></div>
+          <div style="display:flex;align-items:center"><span style="background:#3b4261;color:#c0caf5;padding:2px 8px">~/acme</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #3b4261"></div><span style="background:#D55E00;color:#101014;font-weight:700;padding:2px 8px">■ 91%</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #D55E00"></div><span style="color:#7aa2f7;margin-left:8px">❯</span></div>
+          <div style="display:flex;align-items:center"><span style="background:#3b4261;color:#c0caf5;padding:2px 8px">~/acme</span><div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:7px solid #3b4261"></div><span style="border:1px dashed #565f89;color:#565f89;padding:1px 8px">◌ --%</span><span style="color:#7aa2f7;margin-left:8px">❯</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      Shape is the primary channel (● ◆ ▲ ■) — zone readable without color · ASCII fallback: <span style="font-family:'JetBrains Mono',monospace">(ctx 45 Y)</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 1e RUNWAY FORECAST ══════════════ -->
+<div class="dv-opt" id="1e" data-screen-label="1e Runway forecast">
+  <div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Runway forecast — projection ahead of the cursor · loud unknown</div>
+  <div class="dv-card" style="width:620px">
+    <div style="display:flex;align-items:center;padding:8px 14px;background:#1a1b26;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font:500 11px 'JetBrains Mono',monospace;color:#565f89">ctxmon status --forecast</span>
+    </div>
+    <div style="padding:26px 20px 16px;font-family:'JetBrains Mono',monospace">
+      <div style="position:relative;height:20px;background:#1f2335;border-radius:4px">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:58%;background:#e0af68;border-radius:4px 0 0 4px"></div>
+        <div style="position:absolute;left:58%;top:0;bottom:0;width:13%;background:repeating-linear-gradient(45deg,rgba(224,175,104,.45) 0 4px,rgba(224,175,104,.08) 4px 8px);border-right:1px dashed #e0af68"></div>
+        <div style="position:absolute;left:40%;top:-4px;bottom:-4px;width:1px;background:rgba(224,175,104,.6)"></div>
+        <div style="position:absolute;left:60%;top:-4px;bottom:-4px;width:1px;background:rgba(255,158,100,.6)"></div>
+        <div style="position:absolute;left:75%;top:-4px;bottom:-4px;width:1px;background:rgba(247,118,142,.7)"></div>
+        <div style="position:absolute;left:40%;top:-18px;transform:translateX(-50%);font:600 9px 'JetBrains Mono',monospace;color:#e0af68">Y·40</div>
+        <div style="position:absolute;left:60%;top:-18px;transform:translateX(-50%);font:600 9px 'JetBrains Mono',monospace;color:#ff9e64">O·60</div>
+        <div style="position:absolute;left:75%;top:-18px;transform:translateX(-50%);font:600 9px 'JetBrains Mono',monospace;color:#f7768e">R·75</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px;font:400 11px 'JetBrains Mono',monospace;color:#565f89">
+        <span><span style="color:#e0af68;font-weight:700">58% yellow</span> · 116k/200k</span>
+        <span>█ used · ▨ projected next 5 turns</span>
+      </div>
+      <div style="margin-top:12px;font:400 12px 'JetBrains Mono',monospace;color:#c0caf5">→ projects <span style="color:#ff9e64;font-weight:700">71%</span> in 5 turns · <span style="color:#ff9e64">~1 turn → orange</span> · <span style="color:#565f89">checkpoint before orange recommended</span></div>
+      <div style="margin-top:18px;border:1px solid #f7768e;background:rgba(247,118,142,.08);border-radius:6px;padding:10px 14px">
+        <div style="font:700 12px 'JetBrains Mono',monospace;color:#f7768e;letter-spacing:.5px">▲ TELEMETRY UNAVAILABLE — ZONE UNKNOWN, TREATING AS RED</div>
+        <div style="margin-top:4px;font:400 11px 'JetBrains Mono',monospace;color:#c0caf5">never assumes green · <span style="color:#f7768e">handoff summary armed</span> · retry in 10s</div>
+        <div style="margin-top:8px;height:14px;border-radius:3px;background:repeating-linear-gradient(45deg,rgba(247,118,142,.25) 0 4px,rgba(247,118,142,.05) 4px 8px);display:flex;align-items:center;padding:0 8px"><span style="font:700 9px 'JetBrains Mono',monospace;color:#f7768e;letter-spacing:3px">? ? ? ? ? ? ?</span></div>
+      </div>
+    </div>
+    <div style="padding:7px 14px;background:#12121a;border-top:1px solid rgba(255,255,255,.04);font:400 10.5px system-ui,sans-serif;color:#565f89">
+      Novel: shows where you're <em>going</em>, not just where you are — the loud unknown block is the fail-safe state
+    </div>
+  </div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "riff on <a class="dv-oid" href="#1a">1a</a> with the colorblind palette from <a class="dv-oid" href="#1d">1d</a>" · "animate <a class="dv-oid" href="#1e">1e</a>'s projection" · "combine <a class="dv-oid" href="#1a">1a</a> + <a class="dv-oid" href="#1c">1c</a> into one prototype" · "new directions"</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;simSpeed&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 1, &quot;min&quot;: 0.25, &quot;max&quot;: 4, &quot;step&quot;: 0.25, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Simulation&quot;},
+  &quot;contextWindowK&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 200, &quot;min&quot;: 32, &quot;max&quot;: 1000, &quot;unit&quot;: &quot;k tokens&quot;, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Simulation&quot;},
+  &quot;yellowAt&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 40, &quot;min&quot;: 10, &quot;max&quot;: 90, &quot;unit&quot;: &quot;%&quot;, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Zone thresholds&quot;},
+  &quot;orangeAt&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 60, &quot;min&quot;: 20, &quot;max&quot;: 95, &quot;unit&quot;: &quot;%&quot;, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Zone thresholds&quot;},
+  &quot;redAt&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 75, &quot;min&quot;: 30, &quot;max&quot;: 99, &quot;unit&quot;: &quot;%&quot;, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Zone thresholds&quot;}
+}">
+class Component extends DCLogic {
+  state = { t: 88, events: [], toastAge: 999 };
+
+  componentDidMount() {
+    this.iv = setInterval(() => {
+      const sp = this.props.simSpeed ?? 1;
+      this.setState(s => {
+        const t1 = s.t + sp;
+        const p0 = this.pctAt(s.t), p1 = this.pctAt(t1);
+        const z0 = this.zoneFor(p0), z1 = this.zoneFor(p1);
+        let events = s.events || [];
+        let toastAge = (s.toastAge ?? 999) + sp;
+        if (z1.name !== z0.name) {
+          const drop = p1 < p0;
+          const bounds = [this.props.yellowAt ?? 40, this.props.orangeAt ?? 60, this.props.redAt ?? 75];
+          const crossed = bounds.filter(b => p0 < b && p1 >= b);
+          const trig = drop
+            ? 'compaction ' + Math.round(p0) + '% \u2192 ' + Math.round(p1) + '%'
+            : 'crossed ' + crossed.join('% & ') + '%';
+          events = [{ zone: z1.name, c: z1.c, glyph: this.glyphFor(z1.name), pct: Math.round(p1), trig, drop }].concat(events).slice(0, 4);
+          toastAge = 0;
+        }
+        return { t: t1, events, toastAge };
+      });
+    }, 110);
+  }
+
+  glyphFor(n) {
+    return { GREEN: '\u25CF', YELLOW: '\u25C6', ORANGE: '\u25B2', RED: '\u25A0' }[n] || '\u25CC';
+  }
+  componentWillUnmount() { clearInterval(this.iv); if (this.hoIv) clearInterval(this.hoIv); }
+
+  hoStart() {
+    if (this.hoIv) clearInterval(this.hoIv);
+    this.setState({ hoStep: 1 });
+    this.hoIv = setInterval(() => {
+      this.setState(s => {
+        const n = Math.min(6, (s.hoStep || 0) + 1);
+        if (n >= 6 && this.hoIv) { clearInterval(this.hoIv); this.hoIv = null; }
+        return { hoStep: n };
+      });
+    }, 480);
+  }
+  hoVals() {
+    const st = this.state.hoStep || 0;
+    const d = (n) => st >= n ? 'block' : 'none';
+    return {
+      hoRun: () => this.hoStart(),
+      hoAgain: () => { if (this.hoIv) clearInterval(this.hoIv); this.hoIv = null; this.setState({ hoStep: 0 }); },
+      hoBtnDisplay: st === 0 ? 'inline-block' : 'none',
+      hoD1: d(1), hoD2: d(2), hoD3: d(3), hoD4: d(4), hoD5: d(5),
+      hoDoneDisplay: st >= 6 ? 'block' : 'none'
+    };
+  }
+
+  pctAt(rawT) {
+    const KF = [[0,12],[16,16],[24,17],[38,25],[50,27],[64,34],[80,38],[92,39],[100,43],[114,46],[128,54],[142,57],[156,65],[170,69],[186,78],[200,81],[214,88],[230,93],[246,94],[262,94]];
+    const P = 280;
+    const x = ((rawT % P) + P) % P;
+    if (x >= 262) return 94;
+    for (let i = 0; i < KF.length - 1; i++) {
+      const a = KF[i], b = KF[i + 1];
+      if (x >= a[0] && x <= b[0]) return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
+    }
+    return 12;
+  }
+
+  zoneFor(p) {
+    const y = this.props.yellowAt ?? 40, o = this.props.orangeAt ?? 60, r = this.props.redAt ?? 75;
+    if (p < y) return { name: 'GREEN', c: '#9ece6a' };
+    if (p < o) return { name: 'YELLOW', c: '#e0af68' };
+    if (p < r) return { name: 'ORANGE', c: '#ff9e64' };
+    return { name: 'RED', c: '#f7768e' };
+  }
+
+  artMark(v) {
+    this.setState(s => {
+      const st = (s.artSt || ['p','p','p','p','p']).slice();
+      const i = st.indexOf('p');
+      if (i !== -1) st[i] = v;
+      return { artSt: st };
+    });
+  }
+  artBack() {
+    this.setState(s => {
+      const st = (s.artSt || ['p','p','p','p','p']).slice();
+      let i = st.indexOf('p');
+      i = (i === -1 ? st.length : i) - 1;
+      if (i >= 0) st[i] = 'p';
+      return { artSt: st };
+    });
+  }
+  artVals() {
+    const ART = [
+      { pre: '', match: 'We decided', post: ' to use the adapter approach for the auth layer; token exchange stays server-side.', rule: 'decision-language', rc: '#7aa2f7', phrase: '\u201Cwe decided\u201D', loc: 'turn 12 \u00B7 assistant', file: 'artifacts/decision-auth-adapter.md' },
+      { pre: '', match: 'Agreed to', post: ' cap retries at 3 with exponential backoff, 250ms base.', rule: 'decision-language', rc: '#7aa2f7', phrase: '\u201Cagreed to\u201D', loc: 'turn 18 \u00B7 user', file: 'artifacts/decision-retry-policy.md' },
+      { pre: '', match: 'Root cause', post: ' confirmed: the 401 loop was clock skew between gateway and auth service \u2014 not token expiry.', rule: 'conclusion-language', rc: '#bb9af7', phrase: '\u201Croot cause\u201D', loc: 'turn 21 \u00B7 assistant', file: 'artifacts/conclusion-401-clock-skew.md' },
+      { pre: 'The partner API ', match: 'rate-limits to 60 req/min', post: ' per key \u2014 pagination page size must stay \u2264 50.', rule: 'constraint-discovery', rc: '#73daca', phrase: '\u201Crate-limits \u2026 must\u201D', loc: 'turn 26 \u00B7 assistant', file: 'artifacts/constraint-rate-limit.md' },
+      { pre: 'After connection pooling: ', match: 'p95 latency 340ms \u2192 120ms', post: ' across 12 bench runs.', rule: 'produced-result', rc: '#2ac3de', phrase: '\u201Cp95 \u2026 ms\u201D', loc: 'turn 29 \u00B7 assistant', file: 'artifacts/result-pooling-benchmark.md' }
+    ];
+    const st = this.state.artSt || ART.map(() => 'p');
+    const cur = st.indexOf('p');
+    const done = cur === -1;
+    const c = ART[done ? 0 : cur];
+    const artDots = ART.map((a, i) => ({
+      glyph: st[i] === 'a' ? '\u2713' : st[i] === 'r' ? '\u2715' : (i === cur ? '\u25C9' : '\u25CB'),
+      color: st[i] === 'a' ? '#9ece6a' : st[i] === 'r' ? '#565f89' : (i === cur ? '#c0caf5' : '#3b4261')
+    }));
+    const written = ART.filter((a, i) => st[i] === 'a').map(a => ({ path: a.file }));
+    const nAcc = written.length;
+    const nRej = st.filter(x => x === 'r').length;
+    const anyDecided = st.some(x => x !== 'p');
+    return {
+      artDots,
+      artIdxText: done ? 'review complete' : 'candidate ' + (cur + 1) + ' of ' + ART.length,
+      artCardDisplay: done ? 'none' : 'block',
+      artDoneDisplay: done ? 'block' : 'none',
+      curRule: c.rule, curRuleColor: c.rc, curRuleBg: c.rc + '1a',
+      curPhrase: c.phrase, curLoc: c.loc,
+      curPre: c.pre, curMatch: c.match, curPost: c.post, curFile: c.file,
+      artAccept: () => this.artMark('a'),
+      artReject: () => this.artMark('r'),
+      artUndo: () => this.artBack(),
+      artReset: () => this.setState({ artSt: null }),
+      artUndoOp: anyDecided ? 1 : 0.35,
+      artWritten: written,
+      artSummary: nAcc + ' accepted \u00B7 ' + nRej + ' rejected',
+      artWroteLine: nAcc === 0 ? 'no files written \u2014 nothing was accepted' : 'wrote ' + nAcc + (nAcc === 1 ? ' file' : ' files') + ' \u2014 rejected candidates were not written'
+    };
+  }
+
+  ignVals() {
+    const IGN = [
+      { cmd: 'add retry jitter to the queue worker', pct: 81 },
+      { cmd: 'fix the flaky watch-pane test', pct: 84 },
+      { cmd: 'document the zone engine API', pct: 88 },
+      { cmd: 'add --json output to ctxmon status', pct: 91 },
+      { cmd: 'refactor config loading into one module', pct: 94 }
+    ];
+    const n = Math.min(IGN.length, this.state.ignN || 0);
+    const p = n === 0 ? 76 : IGN[n - 1].pct;
+    const cells = 22, full = Math.round(p / 100 * cells);
+    return {
+      ignRows: IGN.slice(0, n).map(x => ({ cmd: x.cmd, pct: x.pct })),
+      ignWork: () => this.setState(s => ({ ignN: Math.min(IGN.length, (s.ignN || 0) + 1) })),
+      ignReset: () => this.setState({ ignN: 0 }),
+      ignBtnDisplay: n >= IGN.length ? 'none' : 'inline-block',
+      ignDoneDisplay: n >= IGN.length ? 'block' : 'none',
+      ignPctText: p + '%',
+      ignBarFill: '\u2588'.repeat(full),
+      ignBarRest: '\u00B7'.repeat(cells - full),
+      ignTokens: Math.round(p * 2) + 'k/200k',
+      ignCount: 'notice shown once' + (n > 0 ? ' \u00B7 ' + n + (n === 1 ? ' turn' : ' turns') + ' since' : '') + ' \u00B7 repeats 0'
+    };
+  }
+
+  renderVals() {
+    const t = this.state.t;
+    const winK = this.props.contextWindowK ?? 200;
+    const rAt = this.props.redAt ?? 85;
+    const p = this.pctAt(t);
+    const pct = Math.round(p);
+    const z = this.zoneFor(p);
+
+    const cells = 22;
+    const fillF = p / 100 * cells;
+    const full = Math.min(cells, Math.floor(fillF));
+    const eighths = '\u258F\u258E\u258D\u258C\u258B\u258A\u2589\u2588';
+    const fracIdx = Math.floor((fillF - full) * 8);
+    const partial = (full < cells && fracIdx > 0) ? eighths[fracIdx - 1] : '';
+    const barFill = '\u2588'.repeat(full) + partial;
+    const barRest = '\u00B7'.repeat(Math.max(0, cells - full - (partial ? 1 : 0)));
+
+    const ramp = '\u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588';
+    let sparkStr = '';
+    for (let i = 11; i >= 0; i--) {
+      const sp = this.pctAt(Math.max(0, t - i * 5));
+      sparkStr += ramp[Math.min(7, Math.floor(sp / 100 * 8))];
+    }
+
+    const usedK = p / 100 * winK;
+    const tokensText = usedK.toFixed(1) + 'k/' + winK + 'k';
+
+    const back = 30;
+    const slope = (p - this.pctAt(Math.max(0, t - back))) / back;
+    const perTurn = slope * 22;
+    let etaText, forecastText;
+    if (p >= rAt) {
+      etaText = 'handoff now';
+      forecastText = 'RED \u2014 capture a handoff summary now';
+    } else if (perTurn <= 0.1) {
+      etaText = 'burn stable';
+      forecastText = 'usage stable \u2014 keep prompting freely';
+    } else {
+      const turns = Math.max(1, Math.ceil((rAt - p) / perTurn));
+      etaText = '~' + turns + ' turns\u2192red';
+      forecastText = 'red in ~' + turns + ' turns (\u2248' + Math.max(1, Math.round(turns * 1.7)) + ' min at current burn)';
+    }
+    const burnText = '+' + Math.max(0, perTurn).toFixed(1) + '%/turn avg';
+
+    const histCols = [];
+    for (let i = 43; i >= 0; i--) {
+      const hp = this.pctAt(Math.max(0, t - i * 3));
+      const hz = this.zoneFor(hp);
+      histCols.push({ h: Math.max(2, Math.round(hp * 0.64)), c: i === 0 ? hz.c : hz.c + '99' });
+    }
+
+    const aCells = 16, aFull = Math.round(p / 100 * aCells);
+    const asciiBar = '[' + '#'.repeat(aFull) + '.'.repeat(aCells - aFull) + '] ' + pct + '% ' + z.name[0];
+
+    const events = this.state.events || [];
+    const toastAge = this.state.toastAge ?? 999;
+    const ev = events[0] || null;
+    const showToast = !!ev && toastAge < 55;
+    const GUIDE = {
+      YELLOW: 'Favor targeted retrieval over pasting whole documents.',
+      ORANGE: 'Review artifact candidates, then compact the conversation.',
+      RED: 'Start a fresh session from a handoff summary.',
+      GREEN: 'Runway restored \u2014 keep prompting freely.'
+    };
+    const SHORT = {
+      YELLOW: 'prefer retrieval over big pastes',
+      ORANGE: 'review artifacts \u00B7 compact soon',
+      RED: 'handoff \u2192 fresh session',
+      GREEN: 'runway restored'
+    };
+
+    return {
+      pct, pctText: pct + '%', zoneName: z.name, zoneColor: z.c, zoneBg: z.c + '22',
+      barFill, barRest, sparkStr, tokensText, etaText, burnText, forecastText,
+      histCols, asciiBar, meterW: Math.min(100, p),
+      cursorOn: (Math.floor(t) % 8) < 4 ? 1 : 0,
+      toastDisplay: showToast ? 'flex' : 'none',
+      slExpDisplay: showToast ? 'flex' : 'none',
+      slNormDisplay: showToast ? 'none' : 'flex',
+      toastColor: ev ? ev.c : '#9ece6a',
+      toastBg: (ev ? ev.c : '#9ece6a') + '14',
+      toastGlyph: ev ? ev.glyph : '\u25CF',
+      toastTitle: ev ? (ev.drop ? 'BACK IN ' + ev.zone : 'ENTERED ' + ev.zone) : '',
+      toastSub: ev ? (ev.drop ? ev.trig : ev.trig + ' \u00B7 now ' + ev.pct + '%') : '',
+      toastGuide: ev ? GUIDE[ev.zone] : '',
+      slGuide: ev ? SHORT[ev.zone] : '',
+      evLog: events,
+      ...this.artVals(),
+      ...this.hoVals(),
+      ...this.ignVals(),
+      staleAgeText: (31 + Math.floor((t % 470) * 0.11)) + 's'
+    };
+  }
+}
+</script>
+</body>
+</html>
