@@ -1,7 +1,9 @@
 # Obligation: MCP Parity for Session Context Monitor Capabilities
 
-**Status**: OPEN — must be satisfied by the MCP-server feature's spec before any release
-claiming constitution Principle V compliance.
+**Status**: SATISFIED — closed by feature
+[002-mcp-context-server](002-mcp-context-server/spec.md) (2026-07-11), which exposes all
+six capabilities over MCP on the shared `src/core/` library with CLI-identical values
+(see [002-mcp-context-server/contracts/mcp-tools.md](002-mcp-context-server/contracts/mcp-tools.md)).
 
 **Source**: Constitution v1.0.1, Principle V (CLI-First With MCP Parity). Deferral
 recorded in [001-session-context-monitor/plan.md](001-session-context-monitor/plan.md),
@@ -24,12 +26,12 @@ truth — a parallel implementation is a constitution violation, not a shortcut.
 
 ## Acceptance for closing this obligation
 
-- [ ] The MCP feature's spec references this file and enumerates all six capabilities
-- [ ] Implementation imports `src/core/` (no re-implementation; the architecture boundary
+- [x] The MCP feature's spec references this file and enumerates all six capabilities
+- [x] Implementation imports `src/core/` (no re-implementation; the architecture boundary
       test is extended to cover the MCP surface)
-- [ ] MCP outputs validate against the same zod schemas as the CLI `--json` contracts
-- [ ] Principle II preserved: no MCP tool performs a lossy or persisting action without an
+- [x] MCP outputs validate against the same zod schemas as the CLI `--json` contracts
+- [x] Principle II preserved: no MCP tool performs a lossy or persisting action without an
       explicitly user-confirmed request
-- [ ] This file's Status is flipped to SATISFIED with a link to the closing feature
+- [x] This file's Status is flipped to SATISFIED with a link to the closing feature
 
 Created 2026-07-03 during `/speckit-analyze` remediation (finding C1).
