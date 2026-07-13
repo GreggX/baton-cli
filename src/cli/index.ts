@@ -8,6 +8,7 @@ import { pathToFileURL } from 'node:url';
 import { Command, CommanderError } from 'commander';
 import { registerConfigCommand } from './commands/config.js';
 import { registerHandoffCommand } from './commands/handoff.js';
+import { registerMcpCommand } from './commands/mcp.js';
 import { registerSaveCommand } from './commands/save.js';
 import { registerScanCommand } from './commands/scan.js';
 import { registerStatusCommand } from './commands/status.js';
@@ -63,6 +64,12 @@ export function buildProgram(): Command {
   registerWatchCommand(context);
 
   addGlobalOptionsDeep(program);
+
+  // Feature 002 T008: `baton mcp` is a top-level launcher (research R7), not a
+  // `context` subcommand. Registered AFTER the deep pass — it declares its own
+  // --workspace/--allow-writes surface and must not receive the context group's
+  // global flags (which would duplicate --workspace).
+  registerMcpCommand(program);
   return program;
 }
 
