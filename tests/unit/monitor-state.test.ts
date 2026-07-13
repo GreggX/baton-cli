@@ -1,8 +1,11 @@
 // T034 — MonitorState persistence at .baton/state.json: round trip, per-session
 // keying (new session id ⇒ fresh state), and corrupt/missing file ⇒ empty state.
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+// Feature 002 T005 (FR-013, research R9) — atomic temp+rename writes shared by the
+// CLI and MCP surfaces: last-writer-wins, no temp litter, readers tolerate
+// mid-rename absence.
+import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   MONITOR_STATE_RELATIVE_PATH,
@@ -71,5 +74,53 @@ describe('MonitorState persistence (.baton/state.json)', () => {
       JSON.stringify({ sessionId: 42, lastZone: 'purple', dismissals: 'nope' }),
     );
     expect(loadMonitorState(workspace, 's-1')).toEqual(emptyMonitorState('s-1'));
+  });
+});
+
+describe('atomic writes for two-surface concurrency (FR-013, research R9)', () => {
+  it('a save leaves no temp file behind — only the complete state.json', () => {
+    saveMonitorState(workspace, { sessionId: 's-1', lastZone: 'yellow', dismissals: [] });
+    const batonDir = dirname(monitorStatePath(workspace));
+    expect(readdirSync(batonDir)).toEqual(['state.json']);
+  });
+
+  it('last-writer-wins: the newest write is the persisted one, always a complete document', () => {
+    // Simulate the CLI and the MCP server alternating writes on one workspace.
+    const cliState: MonitorState = { sessionId: 's-1', lastZone: 'orange', dismissals: [] };
+    const mcpState: MonitorState = {
+      sessionId: 's-1',
+      lastZone: 'red',
+      dismissals: [
+        { recommendationId: 'r-xyz', zone: 'red', dismissedAt: '2026-07-02T20:00:00.000Z' },
+      ],
+    };
+    for (let round = 0; round < 25; round += 1) {
+      saveMonitorState(workspace, cliState);
+      saveMonitorState(workspace, mcpState);
+      // Every observable file state parses as one complete JSON document.
+      const raw = readFileSync(monitorStatePath(workspace), 'utf8');
+      expect(() => JSON.parse(raw) as unknown).not.toThrow();
+    }
+    expect(loadMonitorState(workspace, 's-1')).toEqual(mcpState);
+  });
+
+  it('readers tolerate mid-rename absence: a vanished file reads as the empty state', () => {
+    saveMonitorState(workspace, { sessionId: 's-1', lastZone: 'orange', dismissals: [] });
+    rmSync(monitorStatePath(workspace)); // the instant between unlink and rename
+    expect(loadMonitorState(workspace, 's-1')).toEqual(emptyMonitorState('s-1'));
+  });
+
+  it('a stale temp file from a crashed writer disturbs neither loads nor later saves', () => {
+    const statePath = monitorStatePath(workspace);
+    saveMonitorState(workspace, { sessionId: 's-1', lastZone: 'yellow', dismissals: [] });
+    writeFileSync(`${statePath}.99999.tmp`, '{"torn": '); // crashed writer's leftovers
+    expect(loadMonitorState(workspace, 's-1')).toEqual({
+      sessionId: 's-1',
+      lastZone: 'yellow',
+      dismissals: [],
+    });
+    const next: MonitorState = { sessionId: 's-1', lastZone: 'green', dismissals: [] };
+    saveMonitorState(workspace, next);
+    expect(loadMonitorState(workspace, 's-1')).toEqual(next);
   });
 });

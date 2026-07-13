@@ -6,7 +6,13 @@
 // State is per-session: a different persisted session id means a fresh state.
 // Corrupt or missing file ⇒ empty state (transitions re-detected; worst case one
 // duplicate notification — acceptable, never data loss).
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+//
+// Feature 002 T005 (FR-013, research R9): the CLI and the MCP server share this
+// file on one workspace, so writes are ATOMIC — write a temp file, rename it over
+// state.json. Rename is atomic on POSIX: every observable file state is a complete
+// document and concurrent writers settle last-writer-wins. Readers already tolerate
+// a mid-rename absence (missing file ⇒ empty state above).
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type { MonitorState } from './types.js';
 import { monitorStateSchema } from './types.js';
@@ -51,9 +57,17 @@ export function loadMonitorState(workspace: string, sessionId: string): MonitorS
   return result.data;
 }
 
-/** Persist the state (creates `.baton/` when needed) — the only unprompted write. */
+/**
+ * Persist the state (creates `.baton/` when needed) — the only unprompted write.
+ * Atomic (FR-013): temp file + rename, so no reader ever observes a torn write;
+ * concurrent writers (CLI watch + MCP server) settle last-writer-wins. The temp
+ * name is per-process (pid) — deterministic, no randomness — so two processes
+ * never share a temp file, and a crash mid-write leaves state.json untouched.
+ */
 export function saveMonitorState(workspace: string, state: MonitorState): void {
   const path = monitorStatePath(workspace);
   mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, `${JSON.stringify(state, null, 2)}\n`);
+  const tempPath = `${path}.${String(process.pid)}.tmp`;
+  writeFileSync(tempPath, `${JSON.stringify(state, null, 2)}\n`);
+  renameSync(tempPath, path);
 }
