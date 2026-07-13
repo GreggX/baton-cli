@@ -59,6 +59,62 @@ Exit codes: `0` success (including estimated readings and empty scan results),
 unavailable. An invalid config file is never fatal outside `config validate`:
 the violation is named on stderr and defaults stay in effect.
 
+## MCP server — `baton mcp`
+
+The same six capabilities are served to the model over the Model Context
+Protocol on stdio — a local subprocess of your agent host, with no network
+listener of any kind. The MCP layer is thin: it imports the same `src/core/`
+library and zod schemas as the CLI, so tool values are identical to the CLI
+`--json` output for identical state.
+
+Connect it to Claude Code (project scope — the single configuration step):
+
+```bash
+npm run build && npm link
+claude mcp add baton -- baton mcp
+# or, once you have confirmed your host prompts for approval on every tool call:
+claude mcp add baton -- baton mcp --allow-writes
+```
+
+One workspace per server instance: the workspace defaults to the directory the
+host launches the subprocess in; override with `--workspace <path>`.
+
+| Tool | Description |
+|---|---|
+| `context_status` | Read the current context health of this session: zone (green/yellow/orange/red), usage percentage, and what to do about it. Cheap — check whenever unsure, and always before pasting large content. |
+| `context_catchup` | What changed since you last checked: zone transitions and pending recommendations, each with its trigger. Returns an explicit empty result when nothing changed — cheap to call routinely. |
+| `context_scan` | Deterministically scan this session for passages worth saving as artifacts (decisions, conclusions, constraints, results, tasks, questions). Use in orange or red before recommending compaction. Read-only. |
+| `context_save` | Request saving scanned candidates as workspace artifacts. Requires explicit user approval; nothing is written if declined. Propose only candidates the user would plausibly want kept. |
+| `context_handoff` | Request generation of a handoff summary file so a fresh session can resume this work. Requires explicit user approval. Recommend this in red. |
+| `context_config` | Read the effective zone thresholds and their source (file or defaults), including any configuration problems. Read-only. |
+
+### Write gating — `--allow-writes`
+
+`context_status`, `context_catchup`, `context_scan`, and `context_config` are
+read-only and idempotent — they never write anything, anywhere. The two
+persisting tools, `context_save` and `context_handoff`, are always listed
+(capability parity with the CLI) but execute only when the server was started
+with `--allow-writes`. Without the flag they return a structured decline naming
+the exact CLI command that performs the same action, and nothing is written —
+no artifact, no handoff file, not even an audit entry.
+
+`--allow-writes` is an attestation, not a convenience switch: by passing it you
+are stating that your MCP host prompts you for approval on **every** tool call
+that can write. Per-request consent lives in the host's approval prompt; the
+flag only tells the server that such a prompt exists.
+
+> **Warning: never combine `--allow-writes` with an auto-approving host
+> configuration** — allowlisted tools, "always allow" rules, or any mode that
+> skips per-call prompts. Doing so removes the user from the write path
+> entirely: the model could persist artifacts or handoff files with nobody
+> approving them. If your host auto-approves tool calls, run the server without
+> `--allow-writes` and perform saves and handoffs yourself via the CLI.
+
+Every write the server actually executes appends one JSON line to
+`.baton/audit.log` (timestamp, tool, candidate ids or output path, gate state —
+never session content), so you can always reconstruct what the agent persisted
+and when.
+
 ## Zones
 
 Usage percentage is classified with three thresholds (defaults 40/60/75):
@@ -101,6 +157,7 @@ stderr and the defaults stay in effect; nothing crashes.
 | `.baton/state.json` | Automatically (the only unprompted write): per-session last observed zone + dismissal bookkeeping. Never contains session content. |
 | `.baton/artifacts/<timestamp>-<ruleId>-<slug>.md` | Only when you accept a candidate (`save`). Provenance header: session, turn, rule, matched phrase, verbatim excerpt. |
 | `.baton/handoff/<timestamp>-handoff.md` | Only when you run `handoff` (and confirm, in a TTY). Plain Markdown with sourced sections and a Resume checklist. |
+| `.baton/audit.log` | Only when an MCP persisting tool (`context_save`, `context_handoff`) actually executes under `--allow-writes`: one appended JSON line per write (timestamp, tool, ids/path, gate state — never session content). Declines and read tools never touch it. |
 
 Session data under `$BATON_CLAUDE_DIR` is never modified — an integration test
 (`tests/integration/read-only.test.ts`) checksums every fixture transcript
@@ -118,7 +175,9 @@ npx tsx scripts/fixtures/generate-calibration.ts   # regenerate SC-007 calibrati
 
 Architecture (constitution-enforced): `src/core/` is the framework-agnostic
 library (zone math, heuristics, artifacts, handoff, config schemas) and never
-imports from `src/adapters/` or `src/cli/`; `src/adapters/claude-code/` is the
-only place with agent-specific knowledge; `src/cli/` is a thin
-commander + Ink presentation layer. Heuristics and scanning are deterministic —
-no clock, no randomness, no network in the scan path.
+imports from `src/adapters/`, `src/cli/`, or `src/mcp/`;
+`src/adapters/claude-code/` is the only place with agent-specific knowledge;
+`src/cli/` (commander + Ink) and `src/mcp/` (MCP SDK over stdio) are thin
+presentation-layer peers over the same core — the only allowed import between
+them is the `baton mcp` launcher (cli → mcp). Heuristics and scanning are
+deterministic — no clock, no randomness, no network in the scan path.
